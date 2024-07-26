@@ -4,12 +4,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Ajax 통신 (배열)</title>
+<script src="./js/jquery.js"></script>
 <script src="./js/index.js"></script>
 <link rel="stylesheet" type="text/css" href="./css/index.css" >
 </head>
 <body>
-메인페이지
+<input type="button" value="클릭" id="btn" ><br><br>
+<input type="button" value="post ajax" id="btn2"><br><br>
+<input type="button" value="응용 post ajax" id="btn3">
 </body>
-<div class="box"></div>
 </html>

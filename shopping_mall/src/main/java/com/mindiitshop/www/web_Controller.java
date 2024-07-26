@@ -1,19 +1,78 @@
 package com.mindiitshop.www;
 
 import java.io.PrintWriter;
+import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class web_Controller {
 	
 	PrintWriter pw = null;
 	
+	@CrossOrigin(origins="*",allowedHeaders ="*")
+	@PostMapping("/ajaxok3.do")
+	public String ajaxok3(@RequestBody String arr, HttpServletResponse res)throws Exception{
+		JSONArray jo = new JSONArray(arr);
+		//System.out.println(arr);
+		JSONArray ja =(JSONArray)jo.get(0);
+		JSONArray ja1 =(JSONArray)jo.get(1);
+		JSONArray ja2 = new JSONArray();
+		ja2.put(ja);
+		ja2.put(ja1);
+		this.pw = res.getWriter();
+		this.pw.print("ok");
+		//System.out.println();
+		return null;
+	}
+	
+	
+	
+	@CrossOrigin(origins="*",allowedHeaders ="*")
+	@PostMapping("/ajaxok2.do")
+	public String ajaxok2(@RequestBody String all_data,HttpServletResponse res)throws Exception {
+		JSONObject jo = new JSONObject(all_data); //{}인식 시킨 후 key값으로 배열을 체크
+		//{a,b,c}
+		JSONArray ja = (JSONArray)jo.get("all_data"); // -> new를 쓰면 안됨 위에서 풀어놓은걸 다시 묶어버림
+		System.out.println(ja.get(0)); //데이터 출력
+		
+		this.pw = res.getWriter();
+		//front가 dataType을 json으로 받겠다고 했기 때문에 json으로 날려줌 
+		JSONObject result = new JSONObject();
+		result.put("result", "ok");
+		this.pw.print(result);
+		return null;
+	}
+	
+	
+	
+	
+	//@ResponseBody : 미디어 타입
+	//@RequestBody : GET/POST 에서는 잘 쓰지 않고, JSON으로 날아왔을 때만 사용
+	//ajax 통신을 하려면 무조건 CORS 방식을 써줘야함
+	@CrossOrigin(origins="*",allowedHeaders ="*")
+	
+	//@RequestParam : 배열을 이용하여 대표키로 전달 또는 대표키 없이 보조키로 전달 될 경우 사용가능
 	@GetMapping("/ajaxok.do")
-	public String ajaxok() {
+	public String ajaxok(@RequestParam(value = "alldata") List<String> alldata,HttpServletResponse res)
+			throws Exception{
 		
-		
+		System.out.println(alldata);
+		System.out.println(alldata.get(0));
+		this.pw = res.getWriter();
+		JSONObject jo = new JSONObject();
+		jo.put("result","ok");
+		this.pw.print(jo);
+		this.pw.close();
 		return null;
 	}
 	
