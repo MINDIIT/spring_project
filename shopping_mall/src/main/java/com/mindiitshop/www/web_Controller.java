@@ -22,6 +22,25 @@ public class web_Controller {
 	
 	PrintWriter pw = null;
 	
+	@CrossOrigin(origins="*",allowedHeaders ="*")
+	@PostMapping("/ajaxokhw.do")
+	public String ajaxokhw (@RequestBody String arr , HttpServletResponse res) {
+		res.setContentType("text/html;charset=utf-8");
+		JSONArray ja = new JSONArray(arr);
+		JSONObject jo = null;
+		
+		JSONArray ja1 = new JSONArray();
+		//System.out.println(jo.get("product"));
+		int w=0;
+		while(w<ja.length()) {
+			jo = (JSONObject)ja.get(w);
+			w++;
+		}
+		System.out.println(jo);
+		
+		
+		return null;
+	}
 	
 	
 	@GetMapping("/restapi.do")
@@ -35,7 +54,6 @@ public class web_Controller {
 			System.out.println("결제내역은 다음과 같습니다.");
 		}
 		System.out.println(mid);
-		
 		return null;
 	}
 	
@@ -48,8 +66,6 @@ public class web_Controller {
 		}
 		return null;
 	}
-	
-	
 	/*
 	@PostMapping("/loginok.do")
 	public String loginok(String mid,HttpServletRequest req) {
