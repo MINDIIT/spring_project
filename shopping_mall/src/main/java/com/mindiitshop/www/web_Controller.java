@@ -27,16 +27,15 @@ public class web_Controller {
 	public String ajaxokhw (@RequestBody String arr , HttpServletResponse res) {
 		res.setContentType("text/html;charset=utf-8");
 		JSONArray ja = new JSONArray(arr);
-		JSONObject jo = null;
-		
+		JSONObject jo1 = (JSONObject)ja.get(0);
+		JSONObject jo2 = (JSONObject)ja.get(1);
+		JSONObject jo3 = (JSONObject)ja.get(2);
 		JSONArray ja1 = new JSONArray();
-		//System.out.println(jo.get("product"));
-		int w=0;
-		while(w<ja.length()) {
-			jo = (JSONObject)ja.get(w);
-			w++;
-		}
-		System.out.println(jo);
+		ja1.put(jo1);
+		ja1.put(jo2);
+		ja1.put(jo3);
+		
+		System.out.println(ja1.get(1));
 		
 		
 		return null;
