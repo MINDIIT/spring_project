@@ -7,6 +7,23 @@ var basket = [{"seq":1,"product":"냉장고","price":"195000"},
 				{"seq":3,"product":"에어프라이어","price":"97000"}];					
 $(function(){
 	
+	//숙제
+	$("#btn4").click(function(){
+		$.ajax({
+			url : "./ajaxokhw.do",
+			type : "post",
+			cache : false,
+			dataType : "text",
+			contentType : "application/json",
+			data : JSON.stringify(basket),
+			success:function($result){
+				console.log($result);
+			},error:function(){
+				console.log("error");
+			}
+		});
+	});
+		
 	//front 배열값 응용편
 	$("#btn3").click(function(){
 		$.ajax({

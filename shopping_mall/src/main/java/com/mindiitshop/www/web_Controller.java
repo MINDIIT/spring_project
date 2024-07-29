@@ -1,9 +1,10 @@
 package com.mindiitshop.www;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -18,10 +19,86 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 @Controller
-public class web_Controller {
+public class web_Controller extends md5_pass {
 	
 	PrintWriter pw = null;
 	
+	//DAO 를 사용하려면 @ModelAttribute 꼭 사용해야함 (회원가입등에서는 필수)
+	//DAO없이 사용시 : 자료형 객체 OR @RequestParam을 이용해서 사용
+	//아이디 찾기 등 여러개 입력값이 많이 필요하지 않을 경우 DAO 없이 진행할 수도 ㅇ
+	//아이디 찾기
+	@Resource(name="userselect")
+	private user_select us;
+	
+	@PostMapping("/idsearch.do")
+	public String idsearch(String[] uname, String uemail,HttpServletResponse res)throws Exception {
+		res.setContentType("text/html; charset=utf-8");
+		//null 일 경우 핸들링 꼭 해줘야 오류 안남
+		this.pw = res.getWriter();
+		try {
+			//uname[0] -> 앞에 uname 이 두개임
+			if(uname[0]==null||uemail==null) {
+				this.pw.print("<script>"
+						+ "alert('올바른 접근방식이 아닙니다.');"
+						+ "location.href='./search_user.jsp';"
+						+ "</script>");
+			}else {
+				ArrayList<Object> onedata = us.search_id(uname[0], uemail);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('database 문제로 인해 해당 정보가 확인되지않습니다');"
+					+ "location.href='./search_user.jsp';"
+					+ "</script>");
+		}finally {
+			this.pw.close();
+		}
+		return null;
+	}
+	
+	//패스워드 변경
+	@PostMapping("/passmodify.do")
+	public String passmodify() {
+		
+		
+		return null;
+	}
+	
+	//server retime 잡아줘야 anotation 뜸
+	//@Resource(name="md5pass")
+	//private md5_pass md;
+	
+	//md5 : 회원가입, 로그인, 패스워드 변경, 1:1문의, 자유게시판, 상품구매내역
+	//패스워드 변경여부를 체크
+	@GetMapping("/passwd.do")
+	public String passwd() {
+		String pwd = "a1234";
+		String result = this.md5_making(pwd);
+		System.out.println(result);
+		return null;
+	}
+	
+	
+	
+	@CrossOrigin(origins="*",allowedHeaders ="*")
+	@PostMapping("/ajaxokhw.do")
+	public String ajaxokhw (@RequestBody String arr , HttpServletResponse res) {
+		res.setContentType("text/html;charset=utf-8");
+		JSONArray ja = new JSONArray(arr);
+		JSONObject jo1 = (JSONObject)ja.get(0);
+		JSONObject jo2 = (JSONObject)ja.get(1);
+		JSONObject jo3 = (JSONObject)ja.get(2);
+		JSONArray ja1 = new JSONArray();
+		ja1.put(jo1);
+		ja1.put(jo2);
+		ja1.put(jo3);
+		
+		System.out.println(ja1);
+		
+		
+		return null;
+	}
 	
 	
 	@GetMapping("/restapi.do")
@@ -35,7 +112,6 @@ public class web_Controller {
 			System.out.println("결제내역은 다음과 같습니다.");
 		}
 		System.out.println(mid);
-		
 		return null;
 	}
 	
