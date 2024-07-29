@@ -41,15 +41,15 @@ public class web_Controller {
 	
 	//HttpSession : interface를 활영하여, 세션을 빠르게 구현하는 방식 스타일
 	@PostMapping("/loginok.do")
-	public String loginok(@RequestParam(value="",required = false) String mid, HttpSession session) {
+	public String loginok(@RequestParam(value="",required = false) 
+	String mid, HttpSession session) {
+		
 		if(mid!=null||mid!="") {
 			session.setAttribute("mid", mid);
 			session.setMaxInactiveInterval(1800);			
 		}
 		return null;
 	}
-	
-	
 	/*
 	@PostMapping("/loginok.do")
 	public String loginok(String mid,HttpServletRequest req) {
