@@ -2,4 +2,9 @@
 <!DOCTYPE configuration
     PUBLIC "-//mybatis.org//DTD configuration 3.0//EN"
     "https://mybatis.org/dtd/mybatis-3-config.dtd">
-<configuration></configuration>
+<configuration>
+	<typeAliases>
+		<typeAlias alias="userdao" type="com.mindiitshop.www.user_dao"/>
+		<typeAlias alias="admindao" type="shopping_admin.admin_dao" />
+	</typeAliases>
+</configuration>
