@@ -73,7 +73,7 @@ public class web_Controller extends md5_pass {
 	//패스워드 변경여부를 체크
 	@GetMapping("/passwd.do")
 	public String passwd() {
-		String pwd = "a1234";
+		String pwd = "shop_master123";
 		String result = this.md5_making(pwd);
 		System.out.println(result);
 		return null;

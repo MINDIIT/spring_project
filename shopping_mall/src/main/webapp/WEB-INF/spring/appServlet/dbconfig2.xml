@@ -18,7 +18,7 @@
 	<bean id="dbinfo2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
 		<property name="url" value="jdbc:mysql://localhost:3306/shop"/>
-		<property name="username" value="midiit"/>
+		<property name="username" value="mindiit"/>
 		<property name="password" value="m1234"/>
 	</bean>
 	

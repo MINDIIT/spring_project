@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -15,6 +16,8 @@
     <link rel="icon" href="./img/logo.png" sizes="32x32">
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
+<script src="./js/jquery.js?v=1"></script>
+<script src="./js/admin.js?v=1"></script>
 <body>
 <!-- 헤더 -->
 <%@ include file="./header.jsp" %>
@@ -32,23 +35,35 @@
         <li>가입일자</li>
         <li>승인여부</li>
     </ol>
+    <cr:if test="${result==null}">
     <ol class="new_admin_none">
         <li>신규 등록된 관리자가 없습니다.</li>
     </ol>
+    </cr:if>
+    <cr:if test="${result!=null}">
+    <cr:forEach var="data" items="${result}">
+    <cr:if test="${data.admin_name!='최고관리자'}">
     <ol class="new_admin_lists2">
-        <li>1</li>
-        <li>한석봉</li>
-        <li>hansbong</li>
-        <li>01012345678</li>
-        <li>hansbong@hanmail.net</li>
-        <li>디자인팀</li>
-        <li>주임</li>
-        <li>2024-07-29</li>
+        <li>${data.aidx}</li>
+        <li>${data.admin_name}</li>
+        <li>${data.admin_id}</li>
+        <li>${data.admin_hp}</li>
+        <li>${data.admin_email}</li>
+        <li>${data.admin_team}</li>
+        <li>${data.admin_position}</li>
+        <li>${data.admin_join}</li>
         <li>
-            <input type="button" value="승인" class="new_addbtn1" title="승인">
-            <input type="button" value="미승인" class="new_addbtn2" title="미승인">
+        <cr:if test="${data.admin_confirm=='Y'}">
+            <input type="button" onclick="agree(${data.aidx})" value="승인" class="new_addbtn1" title="승인" >
+        </cr:if>
+        <cr:if test="${data.admin_confirm=='N'}">
+            <input type="button" onclick="disagree(${data.aidx})" value="미승인" class="new_addbtn2" title="미승인">
+        </cr:if>
         </li>
     </ol>
+    </cr:if>
+    </cr:forEach>
+    </cr:if>
 </section>
 <section></section>
 <section></section>
