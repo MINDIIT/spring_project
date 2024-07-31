@@ -1,8 +1,8 @@
 package shopping_admin;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -11,11 +11,11 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class admin_controller {
@@ -26,6 +26,15 @@ public class admin_controller {
 	private admin_ddl ad;
 	
 	
+	//쇼핑몰 기본설정 등록
+	@PostMapping("/admin/settingsok.do")
+	public String settingsok(@RequestParam(required = false) Map<String, String> formData) {
+		System.out.println(formData);
+		
+		return null;
+	}
+	
+	
 	//관리자 등록 승인 핸들링
 	@GetMapping("/admin/admin_userok.do")
 	public String admin_userok(String agree,HttpServletResponse res)throws Exception {
@@ -33,18 +42,20 @@ public class admin_controller {
 		this.pw = res.getWriter();
 		try {
 			int result = ad.user_agree(agree);
-			if(result>0) {
+			if(result > 0) {
 				this.pw.print("<script>"
 						+ "alert('정상적으로 변경 되었습니다.');"
 						+ "location.href='./admin_list.do';"
-						+ "</scritp>");
+						+ "</script>");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
 					+ "alert('오류로 인해 변경하지 못했습니다.');"
 					+ "history.go(-1);"
-					+ "</scritp>");
+					+ "</script>");
+		}finally {
+			this.pw.close();
 		}
 		return null;
 	}
@@ -59,7 +70,7 @@ public class admin_controller {
 			e.printStackTrace();
 			System.out.println(e);
 		}
-		return "../../admin/admin_list";
+		return "/admin_list";
 	}
 	//아이디 중복 체크
 	@PostMapping("/admin/idcheckok.do")
@@ -101,7 +112,6 @@ public class admin_controller {
 	}
 	
 	//관리자 로그인 
-	@CrossOrigin ( origins="*", allowedHeaders ="*" )
 	@PostMapping("/admin/admin_login.do")
 	public String admin_login(@RequestBody String formData,
 			HttpServletResponse res,HttpServletRequest req)throws Exception {
@@ -109,7 +119,7 @@ public class admin_controller {
 		this.pw = res.getWriter();
 		try {
 			admin_dao data = ad.login(formData);
-			if(data.getAdmin_id() != null) {
+			if(data.getAdmin_id() != null && (data.getAdmin_confirm().equals("Y")||data.getAdmin_confirm().equals("-"))) {
 				HttpSession session = req.getSession();
 				session.setAttribute("admin_name", data.getAdmin_name());
 				session.setMaxInactiveInterval(1800);
@@ -117,11 +127,16 @@ public class admin_controller {
 						+ "alert('"+data.getAdmin_name()+"님 환영합니다.');"
 						+ "location.href='./admin_list.do';"
 						+ "</script>");
+			}else if(data.getAdmin_id() != null && data.getAdmin_confirm().equals("N")) {
+				this.pw.print("<script>"
+						+ "alert('관리자 등록 승인되지 않았습니다. 승인된 후 로그인 시도하세요.');"
+						+ "location.href='./index.jsp';"
+						+ "</script>");				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
-					+ "alert('데이터 오류로 인해 로그인되지않았습니다.');"
+					+ "alert('아이디와 비밀번호를 확인하세요.');"
 					+ "location.href='./index.jsp';"
 					+ "</script>");
 		}finally {
