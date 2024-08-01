@@ -17,7 +17,7 @@
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
 <body>
-<%@include file="./header.jsp" %>
+<%@include file="/admin/header.jsp" %>
 <script src="./js/jquery.js"></script>
 <script src="./js/admin.js"></script>
 <main class="maincss">
@@ -90,7 +90,7 @@
 <ul class="info_form2">
     <li>사업장 우편번호</li>
     <li>
-        <input type="text" class="in_form0" id="business_location_postal_code" name="business_location_postal_code"> 
+        <input type="text" class="in_form0" id="business_location_postal_code" name="business_location_postal_code" maxlength="5"> 
     </li>
     <li>사업장 주소</li>
     <li>
@@ -178,13 +178,13 @@
 </div>
 <div class="btn_div">
     <button type="button" class="sub_btn1" title="설정 저장" id="btn_save">설정 저장</button>
-    <button type="button" class="sub_btn2" title="저장 취소">저장 취소</button>
+    <button type="button" class="sub_btn2" title="저장 취소" id="btn_cancel">저장 취소</button>
 </div>
 </form>
 </section>
 <section></section>
 <section></section>
 </main>
-<%@ include file="./footer.jsp" %>
+<%@ include file="/admin/footer.jsp" %>
 </body>
 </html>

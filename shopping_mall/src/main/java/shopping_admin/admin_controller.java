@@ -26,11 +26,74 @@ public class admin_controller {
 	private admin_ddl ad;
 	
 	
+	//일반회원 리스트 페이지
+	@GetMapping("/admin/shop_member_list.do")
+	public String shop_member_list() {
+		return "shop_member_list";
+	}
+	
+	//카테고리 등록 페이지
+	@GetMapping("/admin/cate_write.do")
+	public String cate_write() {
+		return "cate_write";
+	}
+	
+	//카테고리 리스트 페이지 이동
+	@GetMapping("/admin/cate_list.do")
+	public String cate_list() {
+		return "cate_list";
+	}
+	
+	//상품등록 페이지 이동
+	@GetMapping("/admin/product_write.do")
+	public String product_write() {
+		return "product_write";
+	}
+	//쇼핑몰 상품관리 페이지 이동
+	@GetMapping("/admin/product_list.do")
+	public String product_list() {
+		return "/product_list";
+	}
+	
+	//관리자 추가 페이지 이동
+	@GetMapping("/admin/add_master.do")
+	public String add_master() {
+		return "/add_master";
+	}
+	
+	//웹 사이트 기본설정 페이지 이동
+	@GetMapping("/admin/admin_siteinfo.do")
+	public String admin_siteinfo() {
+		
+		return "/admin_siteinfo";
+	}
+	
+	//카테고리 등록
+	@PostMapping("/admin/cateaddok.do")
+	public String cateaddok() {
+		
+		return null;
+	}
+	
 	//쇼핑몰 기본설정 등록
 	@PostMapping("/admin/settingsok.do")
-	public String settingsok(@RequestParam(required = false) Map<String, String> formData) {
-		System.out.println(formData);
-		
+	public String settingsok(@RequestParam(required = false) Map<String, String> formData,
+			HttpServletResponse res) throws Exception{
+		res.setContentType("text/html;charset=utf-8");
+		this.pw = res.getWriter();
+		try {
+			int result = ad.settings(formData);
+			if(result>2) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 설정이 등록되었습니다.');"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류로 인하여 설정을 등록에 실패했습니다.');"
+					+ "</script>");
+		}
 		return null;
 	}
 	

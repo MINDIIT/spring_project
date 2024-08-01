@@ -5,5 +5,8 @@
 <configuration>
 	<typeAliases>
 		<typeAlias alias="admindao" type="shopping_admin.admin_dao" />
+		<typeAlias alias="websitesettingsdao" type="shopping_admin.website_settings_dao"/>
+		<typeAlias alias="companyinfo" type="shopping_admin.company_info_dao"/>
+		<typeAlias alias="paymentdao" type="shopping_admin.payment_delivery_settings_dao"/>
 	</typeAliases>
 </configuration>

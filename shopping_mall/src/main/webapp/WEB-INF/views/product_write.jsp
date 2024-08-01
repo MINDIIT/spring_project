@@ -17,7 +17,9 @@
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
 <body>
-<%@ include file="./header.jsp" %>
+<script src="./js/jquery.js"></script>
+<script src="./js/admin.js"></script>
+<%@ include file="/admin/header.jsp" %>
 <main class="maincss">
 <section>
 <p>상품 등록 페이지</p>
@@ -27,7 +29,7 @@
         <li>
             <select class="product_input1">
                 <option></option>
-            </select><input type="button" value="카테고리 등록" title="카테고리 등록" class="product_btn"> <span class="help_text">※ 해당 카테고리가 없을 경우 신규 등록하시길 바랍니다.</span>
+            </select><input type="button" value="카테고리 등록" title="카테고리 등록" class="product_btn" id="cate_add"> <span class="help_text">※ 해당 카테고리가 없을 경우 신규 등록하시길 바랍니다.</span>
         </li>
     </ul>
     <ul>
@@ -128,6 +130,6 @@
 </div>
 </section>
 </main>
-<%@ include file="./footer.jsp" %>
+<%@ include file="/admin/footer.jsp" %>
 </body>
 </html>

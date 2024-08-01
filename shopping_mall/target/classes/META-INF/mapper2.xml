@@ -22,10 +22,19 @@
 		insert into admin_user (aidx,admin_id,admin_pass,admin_name,admin_email,admin_hp,admin_team,admin_position,admin_confirm,admin_join)
 		values('0',#{admin_id},#{admin_pass},#{admin_name},#{admin_email},#{admin_hp},#{admin_team},#{admin_position},'N',now());
 	</insert>
-	<!-- 홈페이지 기본설정 등록 -->
-	<!--  <insert>
-		insert into website_settings(sidx,website_title,administrator_email_address,point_use,registration_bonus_points,permission_level,add_time)
-		values ('0',)
-	</insert>-->
-
+	<!-- 웹사이트 설정 테이블 삽입 -->
+	<insert id="insert_websiteinfo" parameterType="Map" useGeneratedKeys="true" keyProperty="sidx">
+		insert into website_settings(website_title,administrator_email_address,point_use,registration_bonus_points,permission_level,add_time)
+		values (#{website_title},#{administrator_email_address},#{point_use},#{registration_bonus_points},#{permission_level},now());
+	</insert>
+	<!-- 회사 정보 테이블 삽입 -->
+	<insert id="insert_companyinfo" parameterType="Map">
+		insert into company_info(sidx,company_name,business_registration_number,ceo_name,company_phone_number,online_business_registration_number,value_added_service_provider_number,business_location_postal_code,business_location_address,data_protection_officer_name,data_protection_officer_email)
+		values (#{sidx},#{company_name},#{business_registration_number},#{ceo_name},#{company_phone_number},#{online_business_registration_number},#{value_added_service_provider_number},#{business_location_postal_code},#{business_location_address},#{data_protection_officer_name},#{data_protection_officer_email});
+	</insert>
+	<!-- 결제 및 배송 설정 테이블 삽입 -->
+	<insert id="insert_payment_delivery_settings" parameterType="Map">
+		insert into payment_delivery_settings(sidx,bank_transfer_bank_name,bank_transfer_account_number,credit_card_payment,mobile_payment,book_voucher_payment,min_payment_point,max_payment_point,cash_receipt_usage,delivery_company_name,delivery_fee,preferred_delivery_date_usage)
+		value (#{sidx},#{bank_transfer_bank_name},#{bank_transfer_account_number},#{credit_card_payment},#{mobile_payment},#{book_voucher_payment},#{min_payment_point},#{max_payment_point},#{cash_receipt_usage},#{delivery_company_name},#{delivery_fee},#{preferred_delivery_date_usage})
+	</insert>
 </mapper>

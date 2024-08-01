@@ -16,8 +16,10 @@
     <link rel="icon" href="./img/logo.png" sizes="32x32">
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
+<script src="./js/jquery.js?v=1"></script>
+<script src="./js/cate.js?v=1"></script>
+<%@ include file="/admin/header.jsp" %>
 <body>
-<%@ include file="./header.jsp" %>
 <main class="maincss">
     <section>    
 <p>카테고리관리 페이지</p>
@@ -71,12 +73,12 @@
 <div class="subpage_view4">
     <input type="button" value="카테고리 삭제" title="카테고리 삭제" class="p_button">
     <span style="float: right;">
-    <input type="button" value="상품 리스트" title="상품 리스트" class="p_button p_button_color1">
-    <input type="button" value="카테고리 등록" title="카테고리 등록" class="p_button p_button_color2">
+    <input type="button" value="상품 리스트" title="상품 리스트" class="p_button p_button_color1" id="btn_product_list">
+    <input type="button" value="카테고리 등록" title="카테고리 등록" class="p_button p_button_color2" id="btn_cate_add">
     </span>
 </div>
 </section>
 </main>
-<%@ include file="./footer.jsp" %>
+<%@ include file="/admin/footer.jsp" %>
 </body>
 </html>

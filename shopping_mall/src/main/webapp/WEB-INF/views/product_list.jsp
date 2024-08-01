@@ -17,7 +17,9 @@
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
 <body>
-<%@ include file="./header.jsp" %>
+<script src="./js/jquery.js?v=1"></script>
+<script src="./js/admin.js?v=1"></script>
+<%@ include file="/admin/header.jsp" %>
 <main class="maincss">
 <section>
 <p>상품관리 페이지</p>
@@ -79,12 +81,12 @@
 <div class="subpage_view4">
     <input type="button" value="선택상품 삭제" title="선택상품 삭제" class="p_button">
     <span style="float: right;">
-    <input type="button" value="신규상품 등록" title="신규상품 등록" class="p_button p_button_color1">
-    <input type="button" value="카테고리 등록" title="카테고리 등록" class="p_button p_button_color2">
+    <input type="button" value="신규상품 등록" title="신규상품 등록" class="p_button p_button_color1" id="btn_product_add">
+    <input type="button" value="카테고리 리스트" title="카테고리 리스트" class="p_button p_button_color2" id="btn_cate_list">
     </span>
 </div>
 </section>
 </main>
-<%@ include file="./footer.jsp" %>
+<%@ include file="/admin/footer.jsp" %>
 </body>
 </html>

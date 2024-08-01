@@ -3,9 +3,37 @@ $(function(){
 	
 ////////아이디 중복체크 여부 
 var $id_doubleck=0;
+///////    상품 등록 페이지   ////////////////////////////////////////////////
 
-//////// 홈페이지 기본설정세팅
+	$('#cate_add').click(function(){
+		location.href="/admin/cate_list.do";
+	});
+
+
+//////    상품관리페이지   //////////////////////////////////////////////////////
+
+//////// 카테고리 리스트 버튼
+	$('#btn_cate_list').click(function(){   
+		location.href="/admin/cate_list.do";
+	})
+
+//////// 신규상품 등록 버튼
+	$('#btn_product_add').click(function(){
+		location.href="/admin/product_write.do";
+	});
+
+//////// 홈페이지 기본 설정 저장취소버튼
+	$('#btn_cancel').click(function(){
+		if(confirm('저장취소 하시겠습니까?')){
+			location.reload();			
+		}
+	});
+
+//////// 쇼핑몰 기본 설정 페이지   ////////////////////////////////////////////////////////////////////
+
+//////// 홈페이지 기본설정 저장버튼
 	$('#btn_save').click(function(){
+		/*
 			var formData = $('#frm_settings').serialize();
 			$.ajax({
 			url : "./settingsok.do",
@@ -20,9 +48,8 @@ var $id_doubleck=0;
 			},error:function(xhr,status,error){
 			alert('설정 저장에 실패했습니다 :'+error);
 			}
-		});
+		});*/
 		
-		/*
 		if($('#website_title').val()==""){
 			alert("홈페이지 제목을 입력하세요.");
 			$('#website_title').focus();
@@ -49,6 +76,7 @@ var $id_doubleck=0;
 							}else{
 								if($('#business_registration_number').val().length<10){
 									alert("사업자등록 번호는 '-'을 제외한 10자리로 입력해주세요.");
+									return false;
 									$('#business_registration_number').focus();
 								}else{
 									if($('#ceo_name').val()==""){
@@ -80,7 +108,7 @@ var $id_doubleck=0;
 																	alert("무통장 은행을 입력하세요.");
 																	$('#bank_transfer_bank_name').focus();
 																}else{
-																	if(!$('#bank_transfer_account_number').val().includes('-')){
+																	if(!$('#bank_transfer_account_number').val().includes('-')&&$('#bank_transfer_bank_name').val()!=""){
 																		alert("'-'을 포함하여 계좌번호를 입력하여주시기 바랍니다.");
 																		$('#bank_transfer_account_number').focus();
 																	}else{
@@ -124,12 +152,13 @@ var $id_doubleck=0;
 																											cache : false,
 																											type : "post",
 																											data : formData,
-																											//contentType : "application/x-www-form-urlencoded",
+																											contentType : "application/x-www-form-urlencoded",
 																											success:function(response){
 																												alert('설정 저장에 성공했습니다.');
-																												location.href="./admin_siteinfo.jsp";
+																												location.href="/admin/admin_siteinfo.do";
 																											},error:function(xhr,status,error){
 																												alert('설정 저장에 실패했습니다 :'+error);
+																												location.reload();
 																											}
 																										});
 																										}
@@ -147,7 +176,7 @@ var $id_doubleck=0;
 																		alert("은행계좌번호를 입력하세요.");
 																		$('#bank_transfer_account_number').focus();
 																	}else{
-																		if(!$('#bank_transfer_account_number').val().includes('-')){
+																		if(!$('#bank_transfer_account_number').val().includes('-')&&$('#bank_transfer_account_number').val()!=""){
 																			alert("'-'을 포함하여 계좌번호를 입력하여주시기 바랍니다.");
 																			$('#bank_transfer_account_number').focus();
 																		}else{
@@ -191,12 +220,13 @@ var $id_doubleck=0;
 																												cache : false,
 																												type : "post",
 																												data : formData,
-																												//contentType : "application/x-www-form-urlencoded",
+																												contentType : "application/x-www-form-urlencoded",
 																												success:function(response){
 																													alert('설정 저장에 성공했습니다.');
-																													location.href="./admin_siteinfo.jsp";
+																													location.href="/admin/admin_siteinfo.do";
 																												},error:function(xhr,status,error){
 																													alert('설정 저장에 실패했습니다 :'+error);
+																													location.reload();
 																												}
 																											});
 																										}
@@ -223,7 +253,6 @@ var $id_doubleck=0;
 						}
 					}
 				}							
-				*/
 	});
 
 

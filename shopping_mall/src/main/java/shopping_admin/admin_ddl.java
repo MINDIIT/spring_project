@@ -1,5 +1,6 @@
 package shopping_admin;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ import org.json.JSONObject;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.mindiitshop.www.md5_pass;
+
 
 @Repository("admin")
 public class admin_ddl extends md5_pass{
@@ -22,8 +23,24 @@ public class admin_ddl extends md5_pass{
 	
 	//홈페이지 기본설정 등록
 	public int settings(Map<String, String> data) {
-		
-		return 0;
+		int result1 = tm2.insert("shopping.insert_websiteinfo",data);
+		  Object sidxObj = data.get("sidx");
+	        String sidxStr = null;
+	        if (sidxObj instanceof BigInteger) {
+	            sidxStr = ((BigInteger) sidxObj).toString();
+	        } else if (sidxObj instanceof Number) {
+	            sidxStr = String.valueOf(((Number) sidxObj).longValue());
+	        } else {
+	            throw new IllegalStateException("Unexpected type for sidx: " + sidxObj.getClass());
+	        }
+	        System.out.println(sidxStr);
+
+	        // sidx 값을 문자열로 변환하여 데이터 맵에 추가
+	        data.put("sidx", sidxStr);		
+	    int result2 = tm2.insert("shopping.insert_companyinfo",data);
+		int result3 = tm2.insert("shopping.insert_payment_delivery_settings",data);
+		int result = result1+result2+result3;
+		return result;
 	}
 	
 	//관리자 등록 승인 여부 핸들링

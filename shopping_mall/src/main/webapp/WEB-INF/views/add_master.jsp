@@ -78,6 +78,6 @@
         </div>
         </form>
     </section>
-<%@ include file="./footer.jsp" %>
+<%@ include file="/admin/footer.jsp" %>
 </body>
 </html>
