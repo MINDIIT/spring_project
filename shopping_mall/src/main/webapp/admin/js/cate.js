@@ -34,10 +34,10 @@ $(function(){
 	
 	//대메뉴명 한글 or 영문만 입력하게하는 유효성 검사
 	$('#main_menu_name').on('input',function(){
-		var inputvalue = $(this).val();
-		if (/[^가-힣a-zA-Z]/.test(inputValue)){
+		var inputv = $(this).val();
+		if (/[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z]/.test(inputv)){
 			alert('한글과 영문만 입력 가능합니다.');
-			var sanitizedValue = inputValue.replace(/[^가-힣a-zA-Z]/g, '');
+			var sanitizedValue = inputv.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z]/g, '');
 			$(this).val(sanitizedValue);
 		}
 	});
@@ -63,7 +63,7 @@ $(function(){
 							alert('대메뉴 명을 입력하세요');
 							$('#main_menu_name').focus();
 						}else{
-							//$("#frm_cate_add").submit();							
+							$("#frm_cate_add").submit();							
 						}
 					}
 				}

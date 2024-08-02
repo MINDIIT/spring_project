@@ -34,19 +34,39 @@ public class admin_controller {
 	
 	//카테고리 등록 페이지
 	@GetMapping("/admin/cate_write.do")
-	public String cate_write() {
+	public String cate_write(HttpServletRequest req,Model m) {
+		HttpSession hs =req.getSession();
+		String admin_id = (String)hs.getAttribute("admin_id");
+		m.addAttribute("admin_id",admin_id);	
 		return "cate_write";
 	}
 	
 	//카테고리 리스트 페이지 이동
 	@GetMapping("/admin/cate_list.do")
-	public String cate_list() {
+	public String cate_list(Model m,HttpServletRequest req) {
+		try {
+			HttpSession hs =req.getSession();
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
+			int ctn = ad.cate_list_page((String)hs.getAttribute("admin_id"));
+			m.addAttribute("result",result);
+			m.addAttribute("ctn",ctn);
+		} catch (Exception e) {
+			System.out.println("db오류");
+		}
 		return "cate_list";
 	}
 	
 	//상품등록 페이지 이동
 	@GetMapping("/admin/product_write.do")
-	public String product_write() {
+	public String product_write(Model m,HttpServletRequest req) {
+		//분류코드 리스트 출력되어야함
+		try {
+			HttpSession hs =req.getSession();
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
+			m.addAttribute("result",result);
+		} catch (Exception e) {
+			System.out.println("db오류");
+		}
 		return "product_write";
 	}
 	//쇼핑몰 상품관리 페이지 이동
@@ -63,22 +83,40 @@ public class admin_controller {
 	
 	//웹 사이트 기본설정 페이지 이동
 	@GetMapping("/admin/admin_siteinfo.do")
-	public String admin_siteinfo() {
-		
+	public String admin_siteinfo(HttpServletRequest req,Model m) {
+		HttpSession hs =req.getSession();
+		String admin_id = (String)hs.getAttribute("admin_id");
+		m.addAttribute("admin_id",admin_id);
 		return "/admin_siteinfo";
 	}
 	
+	
 	//카테고리 등록
 	@PostMapping("/admin/cateaddok.do")
-	public String cateaddok() {
-		
+	public String cateinsertok(@RequestParam(required = false) Map< String, String> data, HttpServletResponse res)throws Exception {
+		res.setContentType("text/html;charset=utf-8");	
+		this.pw = res.getWriter();
+		try {
+			int result = ad.cateinsert(data);
+			if(result>0) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 카테고리가 생성되었습니다.');"
+						+ "location.href='./cate_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류로 인해 카테고리생성에 실패했습니다.');"
+					+ "location.href='./cate_list.do';"
+					+ "</script>");
+		}
 		return null;
 	}
 	
 	//쇼핑몰 기본설정 등록
 	@PostMapping("/admin/settingsok.do")
-	public String settingsok(@RequestParam(required = false) Map<String, String> formData,
-			HttpServletResponse res) throws Exception{
+	public String settingsok(@RequestParam(required = false) Map<String, String> formData,HttpServletResponse res) throws Exception{
 		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();
 		try {
@@ -185,10 +223,11 @@ public class admin_controller {
 			if(data.getAdmin_id() != null && (data.getAdmin_confirm().equals("Y")||data.getAdmin_confirm().equals("-"))) {
 				HttpSession session = req.getSession();
 				session.setAttribute("admin_name", data.getAdmin_name());
+				session.setAttribute("admin_id", data.getAdmin_id());
 				session.setMaxInactiveInterval(1800);
 				this.pw.print("<script>"
 						+ "alert('"+data.getAdmin_name()+"님 환영합니다.');"
-						+ "location.href='./admin_list.do';"
+						+ "location.href='./admin_main.do';"
 						+ "</script>");
 			}else if(data.getAdmin_id() != null && data.getAdmin_confirm().equals("N")) {
 				this.pw.print("<script>"

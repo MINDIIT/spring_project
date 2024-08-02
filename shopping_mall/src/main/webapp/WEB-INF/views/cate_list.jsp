@@ -1,5 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%
+    	float pageno = 8f;
+    	HttpSession hs2 = request.getSession();
+    	int alldata =(int)hs2.getAttribute("ctn");
+    	int total_pg = (int) Math.ceil(alldata/pageno);
+    %>
+    <%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -26,14 +33,12 @@
 <div class="subpage_view">
     <span>등록된 카테고리 0건</span>
     <span>
-        <form>
         <select class="p_select1">
-            <option>카테고리명</option>
-            <option>카테고리코드</option>
+            <option value="">카테고리명</option>
+            <option value="">카테고리코드</option>
         </select>
         <input type="text" class="p_input1" placeholder="검색어를 입력해 주세요">
         <input type="submit" value="검색" title="카테고리 검색" class="p_submit">
-        </form>
     </span>
 </div>
 <div class="subpage_view2">
@@ -45,21 +50,28 @@
         <li>소메뉴 코드(사용안함)</li>
         <li>소메뉴명(사용안함)</li>
         <li>사용 유/무</li>
-        <li>관리</li>
+        <li>관리</li>    
     </ul>
-    <ul>
-        <li><input type="checkbox"></li>
-        <li style="text-align: left; text-indent: 5px;">분류코드</li>
-        <li>대메뉴 코드</li>
-        <li style="text-align: left; text-indent: 5px;">대메뉴명</li>
-        <li>-</li>
-        <li style="text-align: left; text-indent: 5px;">-</li>
-        <li>Y</li>
-        <li>[수정]</li>
-    </ul>
+    <cr:if test="${result!=null}">
+    <cr:forEach var="data" items="${result}">
+	    <ul>
+	        <li><input type="checkbox"></li>
+	        <li style="text-align: left; text-indent: 5px;">${data.classification_code}</li>
+	        <li>${data.main_menu_code}</li>
+	        <li style="text-align: left; text-indent: 5px;">${data.main_menu_name}</li>
+	        <li>-</li>
+	        <li style="text-align: left; text-indent: 5px;">-</li>
+	        <li>${data.menu_usage}</li>
+	        <li>[수정]</li>
+	    </ul>
+    </cr:forEach>
+    </cr:if>    
+    <cr:if test="${result==null}">
     <ul>
         <li style="width: 100%;">등록된 카테고리가 없습니다.</li>
     </ul>
+    </cr:if>
+    
 </div>
 <div class="subpage_view3">
     <ul class="pageing">

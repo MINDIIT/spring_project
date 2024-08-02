@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+            <%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -18,17 +19,20 @@
 </head>
 <body>
 <script src="./js/jquery.js"></script>
-<script src="./js/admin.js"></script>
+<script src="./js/product.js"></script>
 <%@ include file="/admin/header.jsp" %>
 <main class="maincss">
 <section>
+<form id="frm_product_insert">
 <p>상품 등록 페이지</p>
 <div class="product_insert">
     <ul>
         <li>대메뉴 카테고리</li>
         <li>
-            <select class="product_input1">
-                <option></option>
+            <select class="product_input1"  name="main_menu_name">
+            <cr:forEach var="data" items="${result}">
+                <option value="${data.main_menu_name}">${data.main_menu_name}</option>
+            </cr:forEach>   
             </select><input type="button" value="카테고리 등록" title="카테고리 등록" class="product_btn" id="cate_add"> <span class="help_text">※ 해당 카테고리가 없을 경우 신규 등록하시길 바랍니다.</span>
         </li>
     </ul>
@@ -128,6 +132,7 @@
     <input type="button" value="상품 등록" title="상품 등록" class="p_button p_button_color2">
     </span>
 </div>
+</form>
 </section>
 </main>
 <%@ include file="/admin/footer.jsp" %>

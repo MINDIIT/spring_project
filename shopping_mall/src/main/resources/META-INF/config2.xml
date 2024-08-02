@@ -8,5 +8,6 @@
 		<typeAlias alias="websitesettingsdao" type="shopping_admin.website_settings_dao"/>
 		<typeAlias alias="companyinfo" type="shopping_admin.company_info_dao"/>
 		<typeAlias alias="paymentdao" type="shopping_admin.payment_delivery_settings_dao"/>
+		<typeAlias alias="catecodedao" type="shopping_admin.cate_code_dao"/>
 	</typeAliases>
 </configuration>

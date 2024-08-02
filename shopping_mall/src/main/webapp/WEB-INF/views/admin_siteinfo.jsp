@@ -23,6 +23,7 @@
 <main class="maincss">
 <section>
 <form id="frm_settings">
+<input type="hidden" value="${admin_id}" name="admin_id">
     <p>홈페이지 가입환경 설정</p>
 <div class="subpage_view">
 <ul class="info_form">

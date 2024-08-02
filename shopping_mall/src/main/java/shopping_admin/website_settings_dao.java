@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class website_settings_dao {
 	int sidx;
-	String website_title,administrator_email_address,point_use,registration_bonus_points,permission_level,add_time;
+	String admin_id,website_title,administrator_email_address,point_use,registration_bonus_points,permission_level,add_time;
 }

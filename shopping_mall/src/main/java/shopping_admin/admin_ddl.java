@@ -21,6 +21,27 @@ public class admin_ddl extends md5_pass{
 	@Resource(name="template2")
 	private SqlSessionTemplate tm2;
 	
+	
+	//카테고리 등록
+	public int cateinsert(Map<String, String> data) {
+		int result = tm2.insert("shopping.insert_cate",data);
+		return result;
+	}
+	//카테고리 리스트 출력
+	public List<cate_code_dao> cate_all_data(String admin_id){
+		List<cate_code_dao> cd = new ArrayList<cate_code_dao>();
+		if(admin_id.equals("master")) {
+			cd = tm2.selectList("shopping.cate_all_list");			
+		}else {
+			cd = tm2.selectList("shopping.cate_list",admin_id);
+		}
+		return cd;
+	}
+	public int cate_list_page(String admin_id) {
+		int ctn = tm2.selectOne("shopping.cate_list_page",admin_id);
+		return ctn;
+	}
+	
 	//홈페이지 기본설정 등록
 	public int settings(Map<String, String> data) {
 		int result1 = tm2.insert("shopping.insert_websiteinfo",data);

@@ -3,24 +3,10 @@ $(function(){
 	
 ////////아이디 중복체크 여부 
 var $id_doubleck=0;
-///////    상품 등록 페이지   ////////////////////////////////////////////////
-
-	$('#cate_add').click(function(){
-		location.href="/admin/cate_list.do";
-	});
-
 
 //////    상품관리페이지   //////////////////////////////////////////////////////
 
-//////// 카테고리 리스트 버튼
-	$('#btn_cate_list').click(function(){   
-		location.href="/admin/cate_list.do";
-	})
 
-//////// 신규상품 등록 버튼
-	$('#btn_product_add').click(function(){
-		location.href="/admin/product_write.do";
-	});
 
 //////// 홈페이지 기본 설정 저장취소버튼
 	$('#btn_cancel').click(function(){

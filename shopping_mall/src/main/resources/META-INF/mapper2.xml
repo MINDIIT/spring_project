@@ -24,8 +24,8 @@
 	</insert>
 	<!-- 웹사이트 설정 테이블 삽입 -->
 	<insert id="insert_websiteinfo" parameterType="Map" useGeneratedKeys="true" keyProperty="sidx">
-		insert into website_settings(website_title,administrator_email_address,point_use,registration_bonus_points,permission_level,add_time)
-		values (#{website_title},#{administrator_email_address},#{point_use},#{registration_bonus_points},#{permission_level},now());
+		insert into website_settings(admin_id,website_title,administrator_email_address,point_use,registration_bonus_points,permission_level,add_time)
+		values (#{admin_id},#{website_title},#{administrator_email_address},#{point_use},#{registration_bonus_points},#{permission_level},now());
 	</insert>
 	<!-- 회사 정보 테이블 삽입 -->
 	<insert id="insert_companyinfo" parameterType="Map">
@@ -37,4 +37,20 @@
 		insert into payment_delivery_settings(sidx,bank_transfer_bank_name,bank_transfer_account_number,credit_card_payment,mobile_payment,book_voucher_payment,min_payment_point,max_payment_point,cash_receipt_usage,delivery_company_name,delivery_fee,preferred_delivery_date_usage)
 		value (#{sidx},#{bank_transfer_bank_name},#{bank_transfer_account_number},#{credit_card_payment},#{mobile_payment},#{book_voucher_payment},#{min_payment_point},#{max_payment_point},#{cash_receipt_usage},#{delivery_company_name},#{delivery_fee},#{preferred_delivery_date_usage})
 	</insert>
+	<!-- 카테고리 등록 -->
+	<insert id="insert_cate" parameterType="catecodedao">
+		insert into classification_code(cidx,admin_id,classification_code,main_menu_code,main_menu_name,menu_usage,code_add)
+		value ('0',#{admin_id},#{classification_code},#{main_menu_code},#{main_menu_name},#{menu_usage},now())
+	</insert>
+	<!-- 카테고리 리스트 출력 - master(사용 여부 Y인 것만 select함)-->
+	<select id = "cate_all_list" resultType="catecodedao">
+		select * from classification_code where menu_usage='Y' order by admin_id asc, classification_code asc, main_menu_code asc
+	</select>
+	<!-- 카테고리 리스트 출력 -일반 관리자 -->
+	<select id="cate_list" resultType="catecodedao">
+		select * from classification_code where menu_usage='Y' and admin_id=#{admin_id} order by classification_code asc, main_menu_code asc
+	</select>
+	<select id="cate_list_page" resultType="int">
+		select count(*) as ctn from classification_code where menu_usage='Y' and admin_id=#{admin_id} order by cidx desc 
+	</select>
 </mapper>

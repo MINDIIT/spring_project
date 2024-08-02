@@ -17,12 +17,13 @@
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
 <script src="./js/jquery.js?v=1"></script>
-<script src="./js/cate.js?v=1"></script>
+<script src="./js/cate.js?v=2"></script>
 <%@ include file="/admin/header.jsp" %>
 <body>
 <main class="maincss">
 <section>
-<form id="frm_cate_add" method="post" action="/admin/cateaddok.do">
+<form id="frm_cate_add" method="post" action="./cateaddok.do">
+<input type="hidden" value="${admin_id}" name="admin_id">
     <p>카테고리 등록 페이지</p>
     <div class="cate_insert">
         <ul>
@@ -35,8 +36,6 @@
             <li>
                 <input type="text" class="cate_input2" list="lg_menu" id="main_menu_code" name="main_menu_code">
                 <datalist id="lg_menu">
-                    <option>01</option>
-                    <option>02</option>
                 </datalist>
             </li>
             <li>※ 대메뉴에 사용할 코드 번호를 입력하세요 최소 2자 이상의 숫자로 입력하셔야 합니다.</li>

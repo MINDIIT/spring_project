@@ -18,7 +18,7 @@
 </head>
 <body>
 <script src="./js/jquery.js?v=1"></script>
-<script src="./js/admin.js?v=1"></script>
+<script src="./js/product.js"></script>
 <%@ include file="/admin/header.jsp" %>
 <main class="maincss">
 <section>
