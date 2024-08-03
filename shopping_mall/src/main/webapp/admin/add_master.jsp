@@ -15,7 +15,7 @@
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
 <script src="./js/jquery.js"></script>
-<script src="./js/admin.js?v=1"></script>
+<script src="./js/admin.js?v=2"></script>
 <body>
     <header class="admin_title_add">
         <p><img src="./img/logo.png" class="logo_sm"> ADMINISTRATOR ADD</p>
@@ -28,7 +28,7 @@
                 <li class="font_color1">아이디 및 패스워드 정보</li>
                 <li>
                 <input type="text" class="add_input1" id="admin_id" name="admin_id" placeholder="생성할 관리자 아이디를 입력하세요">
-                <button type="button"  class="btn_button">중복체크</button>
+                <button type="button" id="idck" class="btn_button">중복체크</button>
                 </li>
                 <li>
                     <input type="password" class="add_input1" id="admin_pass" placeholder="접속할 패스워드를 입력하세요">
@@ -80,10 +80,4 @@
     </section>
 <%@ include file="./footer.jsp" %>
 </body>
-<script>
-function admin_add(){
-	console.log("test");
-		
-}
-</script>
 </html>

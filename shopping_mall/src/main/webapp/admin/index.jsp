@@ -21,9 +21,8 @@
         <p><img src="./img/logo.png" class="logo_sm"> ADMINISTRATOR</p>
     </header>
     <section class="admin_bgcolor">
-    <form id="frm_login">
+    <form id="frm_login" method="post" action="./admin_login.do">
         <div class="admin_login">
-        
             <span>
                 <div class="left_div">
                 <ul>
@@ -31,8 +30,8 @@
                 <li><input type="password" class="input_text1" id="admin_pass" name="admin_pass" placeholder="관리자 패스워드를 입력하세요"></li>
                 </ul>
                 </div>
-                <div id="btn_submit" class="right_div">
-                    <button type="submit" class="btn_submit" title="MASTER LOGIN">MASTER LOGIN</button>
+                <div  class="right_div">
+                    <button type="submit" id="btn_submit"class="btn_submit" title="MASTER LOGIN">MASTER LOGIN</button>
                 </div>
                 <em class="alert_msg">※ 본 사이트는 관리자 외에는 접근을 금합니다. 페이지 접근에 대한 접속 정보는 모두 기록 됩니다.</em>
             </span>
@@ -42,7 +41,6 @@
                     <li title="아이디/패스워드 찾기">아이디/패스워드 찾기</li>
                 </ol>                
             </span>
-            
         </div>
         </form>
     </section>

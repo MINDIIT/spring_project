@@ -15,13 +15,25 @@
 			</otherwise>
 		</choose>
 	</select>
+	<!-- 아이디 중복 체크 -->
+	<select id="idcheck" parameterType="String" resultType="int">
+		select count(*) as ctn from admin_user where admin_id=#{admin_id}
+	</select>
 	<!-- 로그인 -->
-	<select id="login" resultType="int">
-		select count(*) from admin_user where admin_id=#{admin_id} and admin_pass=#{admin_pass}
+	<select id="login" parameterType="Map" resultType="admindao">
+		select * from admin_user where admin_id=#{admin_id} and admin_pass=#{admin_pass} order by aidx desc;
+	</select>
+	<!-- 관리자 승인 여부 핸들링 -->
+	<update id="agree">
+		update admin_user set admin_confirm=#{admin_confirm} where aidx=#{aidx}
+	</update>
+	<!-- 관리자 승인 대기 리스트 출력 -->
+	<select id="standby_list" resultType="admindao">
+		select * from admin_user order by aidx desc
 	</select>
 	<!-- 관리자 추가 승인대기 -->
-	<insert id="admin_standbyadd">
-		insert into confirm_standby (aidx,admin_id,admin_pass,admin_name,admin_email,admin_hp,admin_team,admin_position,admin_join)
-		values ('0',#{aidx},#{admin_id},#{admin_pass},#{admin_name},#{admin_email},#{admin_hp},#{admin_team},#{admin_position},now())
+	<insert id="admin_standbyadd" parameterType="admindao">
+		insert into admin_user (aidx,admin_id,admin_pass,admin_name,admin_email,admin_hp,admin_team,admin_position,admin_confirm,admin_join)
+		values('0',#{admin_id},#{admin_pass},#{admin_name},#{admin_email},#{admin_hp},#{admin_team},#{admin_position},'N',now());
 	</insert>
 </mapper>
