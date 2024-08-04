@@ -1,29 +1,190 @@
 package shopping_admin;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+@MultipartConfig(
+		fileSizeThreshold = 1024*1024*2,
+		maxRequestSize = 1024*1024*5,
+		maxFileSize = 1024*1024*100
+		)
 public class admin_controller {
 	
 	PrintWriter pw = null;
 	
 	@Resource(name="admin")
 	private admin_ddl ad;
+
+	//공지사항 리스트 페이지로 이동
+	@GetMapping("/admin/notice_list.do")
+	public String notice_list () {
+		
+		return "notice_list";
+	}
+	
+	//일반회원 리스트 페이지
+	@GetMapping("/admin/shop_member_list.do")
+	public String shop_member_list() {
+		return "shop_member_list";
+	}
+	
+	//카테고리 등록 페이지
+	@GetMapping("/admin/cate_write.do")
+	public String cate_write(HttpServletRequest req,Model m) {
+		HttpSession hs =req.getSession();
+		String admin_id = (String)hs.getAttribute("admin_id");
+		m.addAttribute("admin_id",admin_id);	
+		return "cate_write";
+	}
+	
+	//카테고리 리스트 페이지 이동
+	@GetMapping("/admin/cate_list.do")
+	public String cate_list(Model m,HttpServletRequest req) {
+		try {
+			HttpSession hs =req.getSession();
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
+			int ctn = ad.cate_list_page((String)hs.getAttribute("admin_id"));
+			m.addAttribute("result",result);
+			//m.addAttribute("ctn",ctn);
+		} catch (Exception e) {
+			System.out.println("db오류");
+		}
+		return "cate_list";
+	}
+	
+	//상품등록 페이지 이동
+	@GetMapping("/admin/product_write.do")
+	public String product_write(Model m,HttpServletRequest req) {
+		//분류코드 리스트 출력되어야함
+		try {
+			HttpSession hs =req.getSession();
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
+			m.addAttribute("result",result);
+			
+		} catch (Exception e) {
+			System.out.println("db오류");
+		}
+		return "product_write";
+	}
+	//쇼핑몰 상품관리 페이지 이동
+	@GetMapping("/admin/product_list.do")
+	public String product_list() {
+		return "/product_list";
+	}
+	
+	//관리자 추가 페이지 이동
+	@GetMapping("/admin/add_master.do")
+	public String add_master() {
+		return "/add_master";
+	}
+	
+	//웹 사이트 기본설정 페이지 이동
+	@GetMapping("/admin/admin_siteinfo.do")
+	public String admin_siteinfo(HttpServletRequest req,Model m) {
+		HttpSession hs =req.getSession();
+		String admin_id = (String)hs.getAttribute("admin_id");
+		m.addAttribute("admin_id",admin_id);
+		return "/admin_siteinfo";
+	}
+	
+	
+	//상품 코드 중복 확인
+	@PostMapping("/admin/product_codeok.do")
+	public String product_codeok(String product_code,HttpServletResponse res)throws Exception {
+		this.pw = res.getWriter();
+		try {
+			String result = ad.product_code(product_code);
+			this.pw.print(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('데이터 오류로 인헤 중복확인되지 않습니다.');"
+					+ "history.go(-1);"
+					+ "</script>");
+		}finally {
+			this.pw.close();
+		}
+		return null;
+	}
+	
+	
+	//상품 등록
+	@PostMapping("/admin/product_insertok.do")
+	public String product_insertok(@ModelAttribute products_dao product,HttpServletRequest request) throws Exception {
+		request.setCharacterEncoding("utf-8");
+		System.out.println(product.getDiscount_rate());
+		System.out.println(product.getDiscount_price());
+		System.out.println(product.getProduct_price());
+		return null;
+	}
+	
+	//카테고리 등록
+	@PostMapping("/admin/cateaddok.do")
+	public String cateinsertok(@RequestParam(required = false) Map< String, String> data, HttpServletResponse res)throws Exception {
+		res.setContentType("text/html;charset=utf-8");	
+		this.pw = res.getWriter();
+		try {
+			int result = ad.cateinsert(data);
+			if(result>0) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 카테고리가 생성되었습니다.');"
+						+ "location.href='./cate_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류로 인해 카테고리생성에 실패했습니다.');"
+					+ "location.href='./cate_list.do';"
+					+ "</script>");
+		}finally {
+			this.pw.close();
+		}
+		return null;
+	}
+	
+	//쇼핑몰 기본설정 등록
+	@PostMapping("/admin/settingsok.do")
+	public String settingsok(@RequestParam(required = false) Map<String, String> formData,HttpServletResponse res) throws Exception{
+		res.setContentType("text/html;charset=utf-8");
+		this.pw = res.getWriter();
+		try {
+			int result = ad.settings(formData);
+			if(result>2) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 설정이 등록되었습니다.');"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류로 인하여 설정을 등록에 실패했습니다.');"
+					+ "</script>");
+		}finally {
+			this.pw.close();
+		}
+		return null;
+	}
 	
 	
 	//관리자 등록 승인 핸들링
@@ -33,18 +194,20 @@ public class admin_controller {
 		this.pw = res.getWriter();
 		try {
 			int result = ad.user_agree(agree);
-			if(result>0) {
+			if(result > 0) {
 				this.pw.print("<script>"
 						+ "alert('정상적으로 변경 되었습니다.');"
 						+ "location.href='./admin_list.do';"
-						+ "</scritp>");
+						+ "</script>");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
 					+ "alert('오류로 인해 변경하지 못했습니다.');"
 					+ "history.go(-1);"
-					+ "</scritp>");
+					+ "</script>");
+		}finally {
+			this.pw.close();
 		}
 		return null;
 	}
@@ -59,7 +222,7 @@ public class admin_controller {
 			e.printStackTrace();
 			System.out.println(e);
 		}
-		return "../../admin/admin_list";
+		return "/admin_list";
 	}
 	//아이디 중복 체크
 	@PostMapping("/admin/idcheckok.do")
@@ -101,7 +264,6 @@ public class admin_controller {
 	}
 	
 	//관리자 로그인 
-	@CrossOrigin ( origins="*", allowedHeaders ="*" )
 	@PostMapping("/admin/admin_login.do")
 	public String admin_login(@RequestBody String formData,
 			HttpServletResponse res,HttpServletRequest req)throws Exception {
@@ -109,19 +271,25 @@ public class admin_controller {
 		this.pw = res.getWriter();
 		try {
 			admin_dao data = ad.login(formData);
-			if(data.getAdmin_id() != null) {
+			if(data.getAdmin_id() != null && (data.getAdmin_confirm().equals("Y")||data.getAdmin_confirm().equals("-"))) {
 				HttpSession session = req.getSession();
 				session.setAttribute("admin_name", data.getAdmin_name());
+				session.setAttribute("admin_id", data.getAdmin_id());
 				session.setMaxInactiveInterval(1800);
 				this.pw.print("<script>"
 						+ "alert('"+data.getAdmin_name()+"님 환영합니다.');"
-						+ "location.href='./admin_list.do';"
+						+ "location.href='./admin_main.do';"
 						+ "</script>");
+			}else if(data.getAdmin_id() != null && data.getAdmin_confirm().equals("N")) {
+				this.pw.print("<script>"
+						+ "alert('관리자 등록 승인되지 않았습니다. 승인된 후 로그인 시도하세요.');"
+						+ "location.href='./index.jsp';"
+						+ "</script>");				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
-					+ "alert('데이터 오류로 인해 로그인되지않았습니다.');"
+					+ "alert('아이디와 비밀번호를 확인하세요.');"
 					+ "location.href='./index.jsp';"
 					+ "</script>");
 		}finally {

@@ -1,17 +1,10 @@
-package com.mindiitshop.www;
+package shopping_admin;
 
 import java.security.MessageDigest;
 
-import org.springframework.stereotype.Repository;
-
-
-//password 를 md5형태로 변환하는 메소드
-//@Repository("md5pass")
 abstract public class md5_pass {
 	public String md5_making(String upass) {
-		
 		StringBuilder sb = new StringBuilder(); //return에 사용되는 객체
-		/*
 		try {
 			MessageDigest md = MessageDigest.getInstance("md5");
 			md.update(upass.getBytes());
@@ -20,7 +13,7 @@ abstract public class md5_pass {
 			}
 		} catch (Exception e) {
 			sb.append("인자값 오류 발생으로 생성이 되지 않음");
-		}*/
+		}
 		return sb.toString();
 	}
 }
