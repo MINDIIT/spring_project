@@ -22,6 +22,12 @@
 	<resources location="/product/" mapping="/product/**"/>
 	<resources location="/admin/" mapping="/admin/**"/>
 	<resources location="/shopping_admin/" mapping="/shopping_admin/**"/>
+    
+    <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- Set the maximum allowed size (in bytes) for each individual file. -->
+        <beans:property name="maxUploadSize" value="5242880"/> <!-- 5MB -->
+    </beans:bean>
+
 	
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -29,5 +35,5 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
-	<context:component-scan base-package="shopping_admin,shopping" />	
+	<context:component-scan base-package="shopping_admin,shopping,pay" />	
 </beans:beans>

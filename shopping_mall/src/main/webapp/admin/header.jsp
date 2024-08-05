@@ -27,7 +27,7 @@
             <li title="쇼핑몰 회원관리"><a href="/admin/shop_member_list.do">쇼핑몰 회원관리</a></li>
             <li title="쇼핑몰 상품관리"><a href="/admin/product_list.do">쇼핑몰 상품관리</a></li>
             <li title="쇼핑몰 기본설정"><a href="/admin/admin_siteinfo.do">쇼핑몰 기본설정</a></li>
-            <li title="쇼핑몰 공지사항">쇼핑몰 공지사항</li>
+            <li title="쇼핑몰 공지사항"><a href="/admin/notice_list.do">쇼핑몰 공지사항</a></li>
         </ol>
     </div>
 </nav>

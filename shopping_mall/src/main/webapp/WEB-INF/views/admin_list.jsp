@@ -20,7 +20,7 @@
 <script src="./js/admin.js?v=1"></script>
 <body>
 <!-- 헤더 -->
-<%@ include file="/admin/header.jsp" %>
+<%@include file="/admin/header.jsp" %>
 <main class="maincss">
 <section>
     <p>신규등록 관리자</p>

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -16,15 +17,28 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
+@MultipartConfig(
+		fileSizeThreshold = 1024*1024*2,
+		maxRequestSize = 1024*1024*5,
+		maxFileSize = 1024*1024*100
+		)
 public class admin_controller {
 	
 	PrintWriter pw = null;
 	
 	@Resource(name="admin")
 	private admin_ddl ad;
-	
+
+	//공지사항 리스트 페이지로 이동
+	@GetMapping("/admin/notice_list.do")
+	public String notice_list () {
+		
+		return "notice_list";
+	}
 	
 	//일반회원 리스트 페이지
 	@GetMapping("/admin/shop_member_list.do")
@@ -49,9 +63,9 @@ public class admin_controller {
 			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
 			int ctn = ad.cate_list_page((String)hs.getAttribute("admin_id"));
 			m.addAttribute("result",result);
-			m.addAttribute("ctn",ctn);
+			//m.addAttribute("ctn",ctn);
 		} catch (Exception e) {
-			System.out.println("db오류");
+			System.out.println("db오류-2");
 		}
 		return "cate_list";
 	}
@@ -64,14 +78,24 @@ public class admin_controller {
 			HttpSession hs =req.getSession();
 			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
 			m.addAttribute("result",result);
+			m.addAttribute("classification_code",result.get(0).getClassification_code());
+			
 		} catch (Exception e) {
-			System.out.println("db오류");
+			System.out.println("db오류-1");
 		}
 		return "product_write";
 	}
-	//쇼핑몰 상품관리 페이지 이동
+	
+	//쇼핑몰 상품 리스트 출력 페이지
 	@GetMapping("/admin/product_list.do")
-	public String product_list() {
+	public String product_list(Model m,HttpServletRequest req) {
+		try {
+			HttpSession hs = req.getSession();
+			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"));
+			m.addAttribute("result",result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return "/product_list";
 	}
 	
@@ -90,6 +114,50 @@ public class admin_controller {
 		return "/admin_siteinfo";
 	}
 	
+	
+	//상품 코드 중복 확인
+	@PostMapping("/admin/product_codeok.do")
+	public String product_codeok(String product_code,HttpServletResponse res)throws Exception {
+		this.pw = res.getWriter();
+		try {
+			String result = ad.product_code(product_code);
+			this.pw.print(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('데이터 오류로 인헤 중복확인되지 않습니다.');"
+					+ "history.go(-1);"
+					+ "</script>");
+		}finally {
+			this.pw.close();
+		}
+		return null;
+	}
+	
+	
+	//상품 등록
+	@PostMapping("/admin/product_insertok.do")
+	public String product_insertok(@ModelAttribute products_dao dao, HttpServletResponse res, HttpServletRequest req)throws Exception{
+		res.setContentType("text/html;charset=utf-8");	
+		this.pw = res.getWriter();
+		System.out.println(dao.getMain_menu_code());
+		try {
+			int result = ad.product_insert(dao,req);
+			if(result>0) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 상품이 등록 되었습니다.');"
+						+ "location.href='./product_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('상품이 정상적으로 등록되지못했습니다.');"
+					+ "history.go(-1);"
+					+ "</script>");
+		}
+		return null;
+	}
 	
 	//카테고리 등록
 	@PostMapping("/admin/cateaddok.do")
@@ -110,6 +178,8 @@ public class admin_controller {
 					+ "alert('오류로 인해 카테고리생성에 실패했습니다.');"
 					+ "location.href='./cate_list.do';"
 					+ "</script>");
+		}finally {
+			this.pw.close();
 		}
 		return null;
 	}
@@ -131,6 +201,8 @@ public class admin_controller {
 			this.pw.print("<script>"
 					+ "alert('오류로 인하여 설정을 등록에 실패했습니다.');"
 					+ "</script>");
+		}finally {
+			this.pw.close();
 		}
 		return null;
 	}
