@@ -42,18 +42,6 @@
 		insert into classification_code(cidx,admin_id,classification_code,main_menu_code,main_menu_name,menu_usage,code_add)
 		value ('0',#{admin_id},#{classification_code},#{main_menu_code},#{main_menu_name},#{menu_usage},now())
 	</insert>
-	<!-- 카테고리 리스트 출력 - master(사용 여부 Y인 것만 select함)-->
-	<select id = "cate_all_list" resultType="catecodedao">
-		select * from classification_code where menu_usage='Y' order by admin_id asc, classification_code asc, main_menu_code asc
-	</select>
-	<!-- 카테고리 리스트 출력 -일반 관리자 -->
-	<select id="cate_list" resultType="catecodedao">
-		select * from classification_code where menu_usage='Y' and admin_id=#{admin_id} order by classification_code asc, main_menu_code asc
-	</select>
-	<!-- 카테고리 페이지 페이징 위한 select -->
-	<select id="cate_list_page" resultType="int">
-		select count(*) as ctn from classification_code where menu_usage='Y' and admin_id=#{admin_id} order by cidx desc 
-	</select>
 	<!-- 상품 코드 중복 확인 -->
 	<select id="product_code_ck" parameterType="String" resultType="int">
 		select count(*) as ctn from products where product_code=#{product_code}
@@ -63,13 +51,124 @@
 		insert into products (pidx,admin_id,classification_code,main_menu_code,main_menu_name,product_code,product_name,product_additional_description,product_price,discount_rate,discount_price,product_stock,is_available,is_sold_out_early,main_product_image1,main_product_image2,main_product_image3,product_detailed_description,product_insert_time)
 		values ('0',#{admin_id},#{classification_code},#{main_menu_code},#{main_menu_name},#{product_code},#{product_name},#{product_additional_description},#{product_price},#{discount_rate},#{discount_price},#{product_stock},#{is_available},#{is_sold_out_early},#{main_product_image1_path},#{main_product_image2_path},#{main_product_image3_path},#{product_detailed_description},now())
 	</insert>
-	<!-- 상품 리스트 출력 : master-->
-	<select id="product_list_master" resultType="productsdao">
-		select * from products order by admin_id desc ,classification_code asc, main_menu_code asc
+	
+	
+	<!-- 상품 리스트 갯수, 검색된 리스트 갯수 -->
+	<select id="product_count" resultType="int" parameterType="Map">
+		select count(*) as ctn from products
+		<where>
+			<if test="admin_id != 'master'">
+				admin_id =#{admin_id}
+			</if>
+			<if test="search_part != null and search_part != '' and search_word != null and search_word != ''">
+				<if test="admin_id != 'master'">
+				 	and
+				</if>
+				<choose>
+					<when test="search_part == 1">
+						product_name LIKE CONCAT('%', #{search_word}, '%')
+					</when>
+					<when test="search_part == 2">
+						 product_code = #{search_word}
+					</when>
+				</choose>
+			</if>
+		</where>
 	</select>
-	<!-- 상품 리스트 출력 : 일반 관리자 -->
-	<select id="product_list_admin" resultType="productsdao">
-		select * from products where admin_id=#{admin_id} order by classification_code asc, main_menu_code asc
+	
+	<!-- 카테고리 리스트 갯수, 검색된 카테고리 리스트 갯수 -->
+	<select id="category_count" resultType="int" parameterType="Map">
+		SELECT COUNT(*) AS ctn FROM classification_code
+		<where>
+			menu_usage='Y'
+			<if test="admin_id != 'master'">
+				AND admin_id = #{admin_id}
+			</if>
+			<if test="search_part_category != null and search_part_category != '' and search_word_category != null and search_word_category != ''">
+				<choose>
+					<when test="search_part_category == 1">
+						AND main_menu_name LIKE CONCAT('%',#{search_word_category},'%')
+					</when>
+					<when test="search_part_category == 2">
+						AND main_menu_code =#{search_word_category}
+					</when>
+				</choose>
+			</if>
+		</where>
 	</select>
-	<!-- 검색 기능 : 일반 관리자 -->
+	
+	<!-- 상품 리스트 출력, 검색 -->
+    <select id="product_list" resultType="productsdao" parameterType="Map">
+        SELECT * FROM products
+        <where>
+            <if test="admin_id != 'master'">
+                admin_id = #{admin_id}
+            </if>
+            <if test="search_part != null and search_part != '' and search_word != null and search_word != ''">
+                <if test="admin_id != 'master'">
+                    AND
+                </if>
+                <choose>
+                    <when test="search_part == 1">
+                        product_name LIKE CONCAT('%', #{search_word}, '%')
+                    </when>
+                    <when test="search_part == 2">
+                        product_code = #{search_word}
+                    </when>
+                </choose>
+            </if>
+        </where>
+        ORDER BY pidx DESC
+    </select>
+    
+	<!-- 카테고리 리스트 출력, 검색 -->
+	<select id="category_list" resultType="catecodedao" parameterType="Map">
+		SELECT * FROM classification_code
+		<where>
+			menu_usage='Y'
+			<if test="admin_id != 'master'">
+				AND admin_id = #{admin_id}
+			</if>
+			<if test="search_part_category != null and search_part_category != '' and search_word_category != null and search_word_category != ''">
+				<choose>
+					<when test="search_part_category == 1">
+						AND main_menu_name LIKE CONCAT('%',#{search_word_category},'%')
+					</when>
+					<when test="search_part_category == 2">
+						AND main_menu_code =#{search_word_category}
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC
+	</select>
+	<!-- cidx 리스트를 이용해서 main_menu_code 값을 찾는 쿼리 -->
+	<select id="find_main_menu_code" resultType="String">
+		SELECT main_menu_code FROM classification_code WHERE cidx IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<!--  이미 카테고리에 등록된 상품이 있는지 확인하는 코드-->
+	<select id="find_exist_main_menu_code" resultType="int">
+		SELECT COUNT(*) FROM products WHERE main_menu_code IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")" >
+			#{item}
+		</foreach>
+	</select>
+	
+	<!-- 카테고리 삭제 -->
+	<delete id="category_delete" parameterType="list">
+		DELETE FROM classification_code WHERE cidx IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<!-- 상품 삭제 -->
+	<delete id="product_delete" parameterType="list">
+		DELETE FROM products WHERE pidx IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
 </mapper>

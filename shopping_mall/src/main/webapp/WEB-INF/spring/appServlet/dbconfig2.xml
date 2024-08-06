@@ -15,21 +15,21 @@
 
 	<context:annotation-config/>
 	
-	<bean id="dbinfo2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	<bean id="Dbinfo2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
 		<property name="url" value="jdbc:mysql://localhost:3306/shop"/>
 		<property name="username" value="mindiit"/>
 		<property name="password" value="m1234"/>
 	</bean>
 	
-	<bean id="factory2" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dbinfo2"/>
+	<bean id="Factory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="Dbinfo2"/>
 		<property name="configLocation" value="classpath:/META-INF/config2.xml"/>
 		<property name="mapperLocations" value="classpath:/META-INF/mapper2.xml"/>
 	</bean>
 	
-	<bean id="template2" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="close">
-		<constructor-arg name="sqlSessionFactory" ref="factory2"/>
+	<bean id="Template2" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="close">
+		<constructor-arg name="sqlSessionFactory" ref="Factory2"/>
 	</bean>
 
 

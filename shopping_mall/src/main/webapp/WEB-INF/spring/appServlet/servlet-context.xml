@@ -13,19 +13,27 @@
 	<annotation-driven />
 
 	<!-- 해당 resources 태그는 특정 디렉토리를 설정하여 각종 속성파일을 로드 할 수 있도록 설정하는 보안 태그-->
+	<!-- 
 	<resources mapping="/resources/**" location="/resources/" />
 	<resources mapping="/js/**" location="/js/"/>
+	 -->
 	<!-- css=> .map, .scss -->
+	<!--
 	<resources location="/css/" mapping="/css/*.css"/>
 	<resources location="/images/" mapping="/images/**"/>
 	<resources location="/upload/" mapping="/upload/**"></resources>
 	<resources location="/product/" mapping="/product/**"/>
 	<resources location="/admin/" mapping="/admin/**"/>
 	<resources location="/shopping_admin/" mapping="/shopping_admin/**"/>
+	<resources location="/pay/" mapping="/pay/**"/>
+    -->
+    <resources location="/" mapping="/**"/>
     
     <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <!-- Set the maximum allowed size (in bytes) for each individual file. -->
+        <beans:property name="defaultEncoding" value="utf-8"/>
         <beans:property name="maxUploadSize" value="5242880"/> <!-- 5MB -->
+        <beans:property name="maxInMemorySize" value="2097152"/>
     </beans:bean>
 
 	
@@ -34,6 +42,5 @@
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
-	
-	<context:component-scan base-package="shopping_admin,shopping,pay" />	
+	<context:component-scan base-package="shopping_admin,shopping,pay" />
 </beans:beans>
