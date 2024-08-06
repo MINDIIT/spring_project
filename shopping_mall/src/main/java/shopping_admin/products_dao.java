@@ -30,4 +30,5 @@ public class products_dao {
 	String main_product_image1_path;
 	String main_product_image2_path;
 	String main_product_image3_path;
+	String search_part, search_word;
 }

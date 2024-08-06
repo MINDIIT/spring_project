@@ -100,6 +100,13 @@ $(function(){
 	
 	//상품코드 중복 체크 여부 확인
 	var $product_code_doubleck=0;
+	
+	//상품 리스트 버튼
+	$('#product_list_btn').click(function(){
+		location.href='./product_list.do';
+		
+	});
+	
 	//상품 등록 버튼
 	$('#product_insert_btn').click(function(){
 		//파일이 첨부되었는지 여부를 검사하는 변수
@@ -164,6 +171,59 @@ $(function(){
 				console.log($error);
 			}
 		});
+	});
+	
+	//상품 삭제 버튼 핸들링
+	$('#product_delete_btn').click(function(){
+		var select_product=[];
+		var delete_data="";
+		$('input[name="product_ck"]:checked').each(function(){
+			select_product.push($(this).val());
+		});
+		if(select_product==""){
+			alert('삭제할 상품을 선택하세요');
+			return false;
+		}else{
+			for(var i = 0;i<select_product.length;i++){
+				delete_data =select_product.join(',');
+			}
+			location.href="./product_delete.do?pidx="+delete_data;
+		}
+	});
+	
+	//상품 전체 체크박스 버튼 핸들링
+	$('#product_all_ck').click(function(){
+		var isChecked = $(this).prop('checked');
+		
+		$('input[name="product_ck"]').prop('checked',isChecked);
+	});
+	
+	//상품 체크박스 핸들링
+	$('input[name="product_ck"]').click(function(){
+		var total = $('input[name="product_ck"]').length;
+		var checked = $('input[name="product_ck"]:checked').length;
+		$('#product_all_ck').prop('checked',total===checked);
+	});
+	
+	//카테고리 리스트 검색 버튼
+	$('#cate_search_btn').click(function(){
+		if($('#search_word_category').val()==""){
+			alert('검색할 단어를 입력하세요');
+			$('#search_word_category').focus();
+		}else{
+			$('#frm_search_cate').submit();
+		}
+	});
+	
+	
+	//상품 리스트 검색 버튼
+	$('#search_btn').click(function(){
+		if($('#search_word').val()==""){
+			alert('검색할 단어를 입력하세요');
+			$('#search_word').focus();
+		}else{
+			$('#frm_search_btn').submit();
+		}
 	});
 	
 	//카테고리 등록 버튼

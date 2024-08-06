@@ -24,22 +24,22 @@
 <main class="maincss">
 <section>
 <p>상품관리 페이지</p>
+<form id="frm_search_btn" method="get" action="./product_list.do">
 <div class="subpage_view">
-    <span>등록된 상품 0건</span>
+    <span>등록된 상품 ${ctn}건</span>
     <span>
-        <form>
-        <select class="p_select1">
-            <option>상품명</option>
-            <option>상품코드</option>
+        <select class="p_select1" name="search_part">
+            <option value="1">상품명</option>
+            <option value="2">상품코드</option>
         </select>
-        <input type="text" class="p_input1" placeholder="검색어를 입력해 주세요">
-        <input type="submit" value="검색" title="상품검색" class="p_submit">
-        </form>
+        <input type="text" class="p_input1" id="search_word" value="${search_word}" name="search_word" placeholder="검색어를 입력해 주세요">
+        <input type="submit" value="검색" title="상품검색" id="search_btn" class="p_submit">
     </span>
 </div>
+</form>
 <div class="subpage_view2">
     <ul>
-        <li><input type="checkbox"></li>
+        <li><input type="checkbox" id="product_all_ck"></li>
         <li>코드</li>
         <li>이미지</li>
         <li>상품명</li>
@@ -55,9 +55,9 @@
     <cr:if test="${result!=null}">
     <cr:forEach var="data" items="${result}">
     <ul>
-        <li><input type="checkbox"></li>
+        <li><input type="checkbox" name="product_ck" value="${data.pidx}"></li>
         <li>${data.product_code}</li>
-        <li><img src="../${data.main_product_image1_path}" width="50" height="50"></li>
+        <li><img src=".././${data.main_product_image1_path}" width="50" height="50"></li>
         <li>${data.product_name}</li>
         <li>${data.classification_code}</li>
         <li>${data.product_price}</li>
@@ -70,7 +70,7 @@
     </ul>
     </cr:forEach>
     </cr:if>
-    <cr:if test="${result==null}">
+    <cr:if test="${empty result}">
     <ul>
         <li style="width: 100%;">등록된 상품이 없습니다.</li>
     </ul>
@@ -86,7 +86,7 @@
     </ul>
 </div>
 <div class="subpage_view4">
-    <input type="button" value="선택상품 삭제" title="선택상품 삭제" class="p_button">
+    <input type="button" value="선택상품 삭제" title="선택상품 삭제" class="p_button" id="product_delete_btn">
     <span style="float: right;">
     <input type="button" value="신규상품 등록" title="신규상품 등록" class="p_button p_button_color1" id="btn_product_add">
     <input type="button" value="카테고리 리스트" title="카테고리 리스트" class="p_button p_button_color2" id="btn_cate_list">
@@ -96,4 +96,11 @@
 </main>
 <%@ include file="/admin/footer.jsp" %>
 </body>
+<script>
+var ck ="${search_part}";
+if(ck==""){
+	ck="1";
+}
+frm_search_btn.search_part.value=ck;
+</script>
 </html>

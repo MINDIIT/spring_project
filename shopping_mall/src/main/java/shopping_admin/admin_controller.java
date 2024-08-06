@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @MultipartConfig(
@@ -57,26 +55,30 @@ public class admin_controller {
 	
 	//카테고리 리스트 페이지 이동
 	@GetMapping("/admin/cate_list.do")
-	public String cate_list(Model m,HttpServletRequest req) {
+	public String cate_list(Model m,@RequestParam(defaultValue = "",required = false)String search_part_category,@RequestParam(defaultValue = "",required = false)String search_word_category,HttpServletRequest req) {
+
 		try {
 			HttpSession hs =req.getSession();
-			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
-			int ctn = ad.cate_list_page((String)hs.getAttribute("admin_id"));
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"),search_part_category,search_word_category);
+			int ctn = ad.cate_list_page((String)hs.getAttribute("admin_id"),search_part_category,search_word_category);
 			m.addAttribute("result",result);
-			//m.addAttribute("ctn",ctn);
+			m.addAttribute("ctn",ctn);
+			m.addAttribute("search_part_category",search_part_category);
+			m.addAttribute("search_word_category",search_word_category);
+			
 		} catch (Exception e) {
-			System.out.println("db오류-2");
+			e.printStackTrace();
 		}
 		return "cate_list";
 	}
 	
 	//상품등록 페이지 이동
 	@GetMapping("/admin/product_write.do")
-	public String product_write(Model m,HttpServletRequest req) {
+	public String product_write(Model m,HttpServletRequest req,@RequestParam(defaultValue = "",required = false)String search_part_category,@RequestParam(defaultValue = "",required = false)String search_word_category) {
 		//분류코드 리스트 출력되어야함
 		try {
 			HttpSession hs =req.getSession();
-			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"));
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"),search_part_category,search_word_category);
 			m.addAttribute("result",result);
 			m.addAttribute("classification_code",result.get(0).getClassification_code());
 			
@@ -88,11 +90,17 @@ public class admin_controller {
 	
 	//쇼핑몰 상품 리스트 출력 페이지
 	@GetMapping("/admin/product_list.do")
-	public String product_list(Model m,HttpServletRequest req) {
+	public String product_list(Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
+		HttpSession hs = req.getSession();
 		try {
-			HttpSession hs = req.getSession();
-			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"));
-			m.addAttribute("result",result);
+			//검색 기능
+			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word);
+				int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);
+				
+				m.addAttribute("result",result);
+				m.addAttribute("ctn",ctn);
+				m.addAttribute("search_part",search_part);
+				m.addAttribute("search_word",search_word);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -114,6 +122,28 @@ public class admin_controller {
 		return "/admin_siteinfo";
 	}
 	
+	//상품 삭제
+	@GetMapping("/admin/product_delete.do")
+	public String product_deleteok(String pidx,HttpServletResponse res)throws Exception {
+		res.setContentType("text/html;charset=utf-8");	
+		this.pw = res.getWriter();
+		try {
+			int result = ad.product_delete(pidx);
+			if(result>0) {
+				this.pw.write("<script>"
+						+ "alert('정상적으로 상품이 삭제되었습니다.');"
+						+ "location.href='./product_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.write("<script>"
+					+ "alert('오류로 인해 요청하신 작업을 수행하지못했습니다.');"
+					+ "location.href='./product_list.do';"
+					+ "</script>");
+		}
+		return null;
+	}
 	
 	//상품 코드 중복 확인
 	@PostMapping("/admin/product_codeok.do")

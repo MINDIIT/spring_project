@@ -3,6 +3,7 @@ package shopping_admin;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,19 +26,37 @@ public class admin_ddl extends md5_pass{
 	private SqlSessionTemplate tm2;
 	
 	//상품 리스트 출력 페이지
-	public List<products_dao> product_list(String admin_id) {
+	public List<products_dao> product_list(String admin_id,String search_part,String search_word) {
 		List<products_dao> pl = new ArrayList<products_dao>();
-		if(admin_id.equals("master")) { //master 일때는 전체 관리자의 데이터 출력
-			pl = tm2.selectList("shopping.product_list_master");
-		}else {// 그외 관리자는 본인이 등록한 상품들만 볼 수 있도록 함
-			pl = tm2.selectList("shopping.product_list_admin",admin_id);
-		}
+		Map< String, String> search_data = new HashMap<String, String>(); 
+		search_data.put("admin_id", admin_id);
+		search_data.put("search_part", search_part);
+		search_data.put("search_word", search_word);
+		
+		pl =tm2.selectList("shopping.product_list",search_data);
 		return pl;
+	}
+	
+	//상품 리스트 갯수 
+	public int product_list_ea(String admin_id,String search_part,String search_word) {
+		Map< String, String> data = new HashMap<String, String>();
+		data.put("admin_id", admin_id);
+		data.put("search_part", search_part);
+		data.put("search_word", search_word);
+		
+		int result=tm2.selectOne("shopping.product_count",data);
+		return result;
+	}
+	//상품 삭제
+	public int product_delete(String pidx) {
+		String[] pidxdata = pidx.split(",");
+		List<String> pidx_data = Arrays.asList(pidxdata);
+		int result = tm2.delete("shopping.product_delete",pidx_data);
+		return result;
 	}
 	
 	//상품 등록
 	public int product_insert(products_dao dao, HttpServletRequest req) {
-		System.out.println(dao.getMain_menu_code());
 		fileok(dao.getMain_product_image1(), dao , "main_product_image1" ,req);
 		fileok(dao.getMain_product_image2(), dao , "main_product_image2",req);
 		fileok(dao.getMain_product_image3(), dao , "main_product_image3",req);
@@ -92,20 +111,25 @@ public class admin_ddl extends md5_pass{
 	}
 	
 	//카테고리 리스트 출력
-	public List<cate_code_dao> cate_all_data(String admin_id){
+	public List<cate_code_dao> cate_all_data(String admin_id,String search_part_category,String search_word_category){
 		List<cate_code_dao> cd = new ArrayList<cate_code_dao>();
-		if(admin_id.equals("master")) {
-			cd = tm2.selectList("shopping.cate_all_list");			
-		}else {
-			cd = tm2.selectList("shopping.cate_list",admin_id);
-		}
+		Map< String, String> data = new HashMap<String, String>();
+		data.put("admin_id", admin_id);
+		data.put("search_part_category", search_part_category);
+		data.put("search_word_category", search_word_category);
+
+		cd = tm2.selectList("shopping.category_list",data);
 		return cd;
 	}
 	
-	//카테고리 페이징
-	public int cate_list_page(String admin_id) {
-		int ctn = tm2.selectOne("shopping.cate_list_page",admin_id);
-		return ctn;
+	//카테고리 데이터 갯수
+	public int cate_list_page(String admin_id,String search_part_category,String search_word_category) {
+		Map< String, String> data = new HashMap<String, String>();
+		data.put("admin_id", admin_id);
+		data.put("search_part_category", search_part_category);
+		data.put("search_word_category", search_word_category);
+		int result = tm2.selectOne("shopping.category_count",data);
+		return result;
 	}
 	
 	//홈페이지 기본설정 등록
@@ -120,7 +144,6 @@ public class admin_ddl extends md5_pass{
 	        } else {
 	            throw new IllegalStateException("Unexpected type for sidx: " + sidxObj.getClass());
 	        }
-	        System.out.println(sidxStr);
 
 	        // sidx 값을 문자열로 변환하여 데이터 맵에 추가
 	        data.put("sidx", sidxStr);		
