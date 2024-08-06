@@ -100,6 +100,13 @@ $(function(){
 	
 	//상품코드 중복 체크 여부 확인
 	var $product_code_doubleck=0;
+	
+	//상품 리스트 버튼
+	$('#product_list_btn').click(function(){
+		location.href = './product_list.do';
+	});
+	
+	
 	//상품 등록 버튼
 	$('#product_insert_btn').click(function(){
 		//파일이 첨부되었는지 여부를 검사하는 변수

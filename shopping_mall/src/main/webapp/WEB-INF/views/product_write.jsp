@@ -133,7 +133,7 @@
     </ul>
 </div>
 <div class="subpage_view4" style="text-align:center; margin-bottom: 100px;">
-    <input type="button" value="상품 리스트" title="상품 리스트" class="p_button p_button_color1" style="margin-right: 5px;">
+    <input type="button" value="상품 리스트" title="상품 리스트" id="product_list_btn" class="p_button p_button_color1" style="margin-right: 5px;">
     <input type="button" value="상품 등록" title="상품 등록" id="product_insert_btn" class="p_button p_button_color2">
     </span>
 </div>
