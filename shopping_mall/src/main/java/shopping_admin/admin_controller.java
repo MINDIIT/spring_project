@@ -145,7 +145,7 @@ public class admin_controller {
 		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();
 		try {
-			int result = ad.category_delete(cidx);
+			String result = ad.category_delete(cidx);
 //			if(result>0) {
 //				this.pw.write("<script>"
 //						+ "alert('카테고리가 정상적으로 삭제되었습니다.');"

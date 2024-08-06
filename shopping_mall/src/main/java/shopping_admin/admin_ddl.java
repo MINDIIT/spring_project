@@ -111,15 +111,18 @@ public class admin_ddl extends md5_pass{
 	}
 	
 	//카테고리 삭제
-	public int category_delete(String cidx) {
+	public String category_delete(String cidx) {
 		String[] cidxdata = cidx.split(",");
 		List<String> cidx_data = Arrays.asList(cidxdata);
 		List<String> main_menu_code = tm2.selectList("shopping.find_main_menu_code", cidx_data);
 		
 		//products 테이블에 해당 분류코드 가진 상품 존재여부 확인
 		int count = tm2.selectOne("shopping.find_exist_main_menu_code",main_menu_code);
-		//int result = tm2.delete("shopping.category_delete",cidx_data);
-		return 0;
+		if(count>0) {
+			return "delete_reject";
+		}
+		int result = tm2.delete("shopping.category_delete",cidx_data);
+		return "delete_ok";
 	}	
 	//카테고리 리스트 출력
 	public List<cate_code_dao> cate_all_data(String admin_id,String search_part_category,String search_word_category){
