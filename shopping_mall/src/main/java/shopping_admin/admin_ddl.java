@@ -26,17 +26,33 @@ public class admin_ddl extends md5_pass{
 	private SqlSessionTemplate tm2;
 	
 	//상품 리스트 출력 페이지
-	public List<products_dao> product_list(String admin_id,String search_part,String search_word) {
+	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
+		
 		List<products_dao> pl = new ArrayList<products_dao>();
-		Map< String, String> search_data = new HashMap<String, String>(); 
+		Map< String, Object> search_data = new HashMap<String, Object>(); 
 		search_data.put("admin_id", admin_id);
 		search_data.put("search_part", search_part);
 		search_data.put("search_word", search_word);
+		search_data.put("startpg", startpg);
+		search_data.put("pageno", pageno);
 		
 		pl =tm2.selectList("shopping.product_list",search_data);
 		return pl;
 	}
 	
+	//재활용 가능한 페이징 처리
+	public List<products_dao> pageing_process(String admin_id,Integer startpg, Integer pageno, String use_where){
+		List<products_dao> pageing_data = null;
+		Map<String, Object> page = new HashMap<String, Object>();
+		page.put("admin_id", admin_id);
+		page.put("startpg", startpg);
+		page.put("pageno", pageno);
+		if(use_where.equals("product_list")) {
+			pageing_data = tm2.selectList("shopping.product_page",page);
+		}
+		
+		return pageing_data;
+	}
 	//상품 리스트 갯수 
 	public int product_list_ea(String admin_id,String search_part,String search_word) {
 		Map< String, String> data = new HashMap<String, String>();
@@ -57,12 +73,13 @@ public class admin_ddl extends md5_pass{
 	
 	//상품 등록
 	public int product_insert(products_dao dao, HttpServletRequest req) {
-		fileok(dao.getMain_product_image1(), dao , "main_product_image1" ,req);
-		fileok(dao.getMain_product_image2(), dao , "main_product_image2",req);
-		fileok(dao.getMain_product_image3(), dao , "main_product_image3",req);
+		fileok(dao.getMain_product_image1_path(), dao , "main_product_image1" ,req);
+		fileok(dao.getMain_product_image2_path(), dao , "main_product_image2",req);
+		fileok(dao.getMain_product_image3_path(), dao , "main_product_image3",req);
 		int result = tm2.insert("shopping.product_insert",dao);
 		return result;
 	}
+	
 	
 	//상품 등록 시 이미지 파일 저장 경로 설정
 	public void fileok(MultipartFile file, products_dao dao, String fieldname,HttpServletRequest req) {
@@ -77,13 +94,13 @@ public class admin_ddl extends md5_pass{
 				
 				switch (fieldname) {
 				case "main_product_image1":
-					dao.setMain_product_image1_path(uploadurl);
+					dao.setMain_product_image1(uploadurl);
 					break;
 				case "main_product_image2":
-					dao.setMain_product_image2_path(uploadurl);
+					dao.setMain_product_image2(uploadurl);
 					break;
 				case "main_product_image3":
-					dao.setMain_product_image3_path(uploadurl);
+					dao.setMain_product_image3(uploadurl);
 					break;
 				}
 			} catch (Exception e) {
@@ -111,19 +128,24 @@ public class admin_ddl extends md5_pass{
 	}
 	
 	//카테고리 삭제
-	public String category_delete(String cidx) {
-		String[] cidxdata = cidx.split(",");
-		List<String> cidx_data = Arrays.asList(cidxdata);
-		List<String> main_menu_code = tm2.selectList("shopping.find_main_menu_code", cidx_data);
-		
+	public String category_delete(List<String> cidx_data) {
+		String callback ="";
+		List<String> main_menu_name = tm2.selectList("shopping.find_main_menu_code", cidx_data);
 		//products 테이블에 해당 분류코드 가진 상품 존재여부 확인
-		int count = tm2.selectOne("shopping.find_exist_main_menu_code",main_menu_code);
-		if(count>0) {
-			return "delete_reject";
+		int count = tm2.selectOne("shopping.find_exist_main_menu_name",main_menu_name);
+		if(count>0) {//존재하면 reject 반환
+			callback= "delete_reject";
+		}else {
+			int result = tm2.delete("shopping.category_delete",cidx_data);
+			if(result>0) {
+				callback = "delete_ok";
+			}else {
+				callback = "delete_failed";
+			}
 		}
-		int result = tm2.delete("shopping.category_delete",cidx_data);
-		return "delete_ok";
+		return callback;
 	}	
+	
 	//카테고리 리스트 출력
 	public List<cate_code_dao> cate_all_data(String admin_id,String search_part_category,String search_word_category){
 		List<cate_code_dao> cd = new ArrayList<cate_code_dao>();

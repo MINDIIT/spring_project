@@ -13,12 +13,12 @@
 	<annotation-driven />
 
 	<!-- 해당 resources 태그는 특정 디렉토리를 설정하여 각종 속성파일을 로드 할 수 있도록 설정하는 보안 태그-->
-	<!-- 
+	
 	<resources mapping="/resources/**" location="/resources/" />
 	<resources mapping="/js/**" location="/js/"/>
-	 -->
+	
 	<!-- css=> .map, .scss -->
-	<!--
+	
 	<resources location="/css/" mapping="/css/*.css"/>
 	<resources location="/images/" mapping="/images/**"/>
 	<resources location="/upload/" mapping="/upload/**"></resources>
@@ -26,7 +26,8 @@
 	<resources location="/admin/" mapping="/admin/**"/>
 	<resources location="/shopping_admin/" mapping="/shopping_admin/**"/>
 	<resources location="/pay/" mapping="/pay/**"/>
-    -->
+    <resources location="/upload/" mapping="/upload/**"/>
+    
     <resources location="/" mapping="/**"/>
     
     <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

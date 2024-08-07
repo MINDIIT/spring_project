@@ -22,13 +22,13 @@ public class products_dao {
 	String product_stock;
 	String is_available;
 	String is_sold_out_early;
-	MultipartFile main_product_image1;
-	MultipartFile main_product_image2;
-	MultipartFile main_product_image3;
+	MultipartFile main_product_image1_path;
+	MultipartFile main_product_image2_path;
+	MultipartFile main_product_image3_path;
 	String product_detailed_description;
 	String product_insert_time;
-	String main_product_image1_path;
-	String main_product_image2_path;
-	String main_product_image3_path;
+	String main_product_image1;
+	String main_product_image2;
+	String main_product_image3;
 	String search_part, search_word;
 }

@@ -22,7 +22,7 @@
     <div class="nav_div">
         <ol>
         	<%if(admin_name!=null && admin_name.equals("최고관리자")){ %>
-            <li title="쇼핑몰 상품관리">쇼핑몰 관리자 리스트</li>
+            <li title="쇼핑몰 상품관리"><a href="/admin/admin_list.do">쇼핑몰 관리자 리스트</a></li>
             <%} %>
             <li title="쇼핑몰 회원관리"><a href="/admin/shop_member_list.do">쇼핑몰 회원관리</a></li>
             <li title="쇼핑몰 상품관리"><a href="/admin/product_list.do">쇼핑몰 상품관리</a></li>

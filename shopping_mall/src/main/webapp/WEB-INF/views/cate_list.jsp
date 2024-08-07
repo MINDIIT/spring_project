@@ -89,11 +89,4 @@
 </main>
 <%@ include file="/admin/footer.jsp" %>
 </body>
-<script>
-var ck ="${search_part_category}";
-if(ck==""){
-	ck="1";
-}
-frm_search_cate.search_part_category.value=ck;
-</script>
 </html>

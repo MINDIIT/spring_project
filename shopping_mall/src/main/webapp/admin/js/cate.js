@@ -1,3 +1,8 @@
+var ck ="${search_part_category}";
+if(ck==""){
+	ck="1";
+}
+frm_search_cate.search_part_category.value=ck;
 $(function(){
 	////////     카테고리 리스트 페이지     ///////////////////////////////////
 	
@@ -23,7 +28,7 @@ $(function(){
 	//카테고리 삭제 버튼 핸들링
 	$('#cate_delete_btn').click(function(){
 		var select_category=[];
-		var delete_data="";
+//		var delete_data="";
 		$('input[name="category_ck"]:checked').each(function(){
 			select_category.push($(this).val());
 		});
@@ -31,11 +36,32 @@ $(function(){
 			alert('삭제할 카테고리를 선택하세요');
 			return false;
 		}else{
-			for(var i = 0;i<select_category.length;i++){
-				delete_data = select_category.join(',');
+			if(confirm('해당 카테고리를 삭제하시겠습니끼?')){
+//				for(var i = 0;i<select_category.length;i++){
+//					delete_data = select_category.join(',');
+//				}
+				$.ajax({
+					url : './category_delete.do',
+					type : 'post',
+					contentType : 'application/x-www-form-urlencoded',
+					data : {cidx:select_category},
+					traditional: true,
+					success : function(response){
+						if(response=="delete_reject"){
+							alert('선택한 카테고리는 사용중입니다');
+						}else if(response=="delete_ok"){
+							alert('카테고리가 정상적으로 삭제되었습니다.');
+							location.reload();
+						}
+					},error : function(xhr,error){
+						alert('삭제 중 오류가 발생했습니다.');
+						console.log(xhr);	
+					}
+				});
+			}else{
+				alert('삭제가 취소되었습니다.');
 			}
 		}
-		location.href="./category_delete.do?cidx="+delete_data;
 	});	
 	
 	//카테고리 전체 체크박스 핸들링

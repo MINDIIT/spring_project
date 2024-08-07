@@ -57,9 +57,19 @@
     <ul>
         <li><input type="checkbox" name="product_ck" value="${data.pidx}"></li>
         <li>${data.product_code}</li>
-        <li><img src=".././${data.main_product_image1_path}" width="50" height="50"></li>
+        <li>
+        <cr:if test="${data.main_product_image1 != null}">
+        	<img src="../${data.main_product_image1}" width="50" height="50">
+        </cr:if>
+        <cr:if test="${data.main_product_image2 != null}">
+        	<img src="../${data.main_product_image2}" width="50" height="50">
+        </cr:if>
+        <cr:if test="${data.main_product_image3 != null}">
+        	<img src="../${data.main_product_image3}" width="50" height="50">
+        </cr:if>        
+        </li>
         <li>${data.product_name}</li>
-        <li>${data.classification_code}</li>
+        <li>${data.main_menu_name}</li>
         <li>${data.product_price}</li>
         <li>${data.discount_price}</li>
         <li>${data.discount_rate}</li>
@@ -80,7 +90,10 @@
     <ul class="pageing">
         <li><img src="./ico/double_left.svg"></li>
         <li><img src="./ico/left.svg"></li>
-        <li>1</li>
+        <cr:set var="pg" value="${ctn /2+(1-((ctn/2)%1))%1} "/>
+        <cr:forEach var="no" begin="1" end="${pg}" step="1">
+        <li><a href="./product_list.do?page=${no}">${no}</a></li>
+        </cr:forEach>
         <li><img src="./ico/right.svg"></li>
         <li><img src="./ico/double_right.svg"></li>
     </ul>
@@ -96,11 +109,4 @@
 </main>
 <%@ include file="/admin/footer.jsp" %>
 </body>
-<script>
-var ck ="${search_part}";
-if(ck==""){
-	ck="1";
-}
-frm_search_btn.search_part.value=ck;
-</script>
 </html>

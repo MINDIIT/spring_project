@@ -1,3 +1,9 @@
+var ck ="${search_part}";
+if(ck==""){
+	ck="1";
+}
+frm_search_btn.search_part.value=ck;
+
 $(function(){
 	
 	
@@ -184,10 +190,14 @@ $(function(){
 			alert('삭제할 상품을 선택하세요');
 			return false;
 		}else{
-			for(var i = 0;i<select_product.length;i++){
-				delete_data =select_product.join(',');
+			if(confirm('삭제 시 해당 데이터는 복구되지 않습니다. 삭제하시겠습니까?')){
+				for(var i = 0;i<select_product.length;i++){
+					delete_data =select_product.join(',');
+				}
+				location.href="./product_delete.do?pidx="+delete_data;
+			}else{
+				alert('삭제가 취소되었습니다.');
 			}
-			location.href="./product_delete.do?pidx="+delete_data;
 		}
 	});
 	

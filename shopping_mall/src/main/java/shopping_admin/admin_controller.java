@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,19 +83,29 @@ public class admin_controller {
 		return "product_write";
 	}
 	
-	//쇼핑몰 상품 리스트 출력 페이지
+	//상품 리스트 출력 페이지
 	@GetMapping("/admin/product_list.do")
-	public String product_list(Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
+	public String product_list(@RequestParam(value = "",required = false)Integer page ,Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
 		HttpSession hs = req.getSession();
+		int pageno = 5;//한페이지 당 5개 씩
+		int startpg = 0;
 		try {
+			//페이징
+			if(page==null||page==1) {
+				startpg=0;
+			}else {
+				startpg = (page-1)*pageno;
+			}
+			
 			//검색 기능
-			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word);
-				int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);
+			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word,pageno,startpg);
+				int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);			
 				
 				m.addAttribute("result",result);
 				m.addAttribute("ctn",ctn);
 				m.addAttribute("search_part",search_part);
 				m.addAttribute("search_word",search_word);
+				m.addAttribute("startpg",startpg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -140,24 +151,17 @@ public class admin_controller {
 	}
 	
 	//카테고리 삭제
-	@GetMapping("/admin/category_delete.do")
-	public String category_deleteok(String cidx,HttpServletResponse res)throws Exception {
+	@PostMapping("/admin/category_delete.do")
+	public String category_deleteok(@RequestParam List<String> cidx,HttpServletResponse res)throws Exception {
 		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();
+		String result = "";
 		try {
-			String result = ad.category_delete(cidx);
-//			if(result>0) {
-//				this.pw.write("<script>"
-//						+ "alert('카테고리가 정상적으로 삭제되었습니다.');"
-//						+ "location.href='./cate_list.do';"
-//						+ "</script>");
-//			}
+			result = ad.category_delete(cidx);
+			this.pw.print(result);
 		} catch (Exception e) {
 			e.printStackTrace();
-			this.pw.write("<script>"
-					+ "alert('오류로 인해 요청하신 작업을 수행하지못했습니다.');"
-					+ "location.href='./cate_list.do';"
-					+ "</script>");			
+			this.pw.print(result);
 		}
 		return null;
 	}
@@ -292,6 +296,7 @@ public class admin_controller {
 		}
 		return "/admin_list";
 	}
+	
 	//아이디 중복 체크
 	@PostMapping("/admin/idcheckok.do")
 	public String idcheckok(String admin_id,HttpServletResponse res)throws Exception{
@@ -311,6 +316,7 @@ public class admin_controller {
 		}
 		return null;
 	}
+	
 	//로그아웃
 	@GetMapping("/admin/admin_logout.do")
 	public String admin_logout(HttpServletRequest req,HttpServletResponse res) throws Exception {

@@ -49,7 +49,7 @@
 	<!-- 상품 등록 -->
 	<insert id="product_insert" parameterType="productsdao">
 		insert into products (pidx,admin_id,classification_code,main_menu_code,main_menu_name,product_code,product_name,product_additional_description,product_price,discount_rate,discount_price,product_stock,is_available,is_sold_out_early,main_product_image1,main_product_image2,main_product_image3,product_detailed_description,product_insert_time)
-		values ('0',#{admin_id},#{classification_code},#{main_menu_code},#{main_menu_name},#{product_code},#{product_name},#{product_additional_description},#{product_price},#{discount_rate},#{discount_price},#{product_stock},#{is_available},#{is_sold_out_early},#{main_product_image1_path},#{main_product_image2_path},#{main_product_image3_path},#{product_detailed_description},now())
+		values ('0',#{admin_id},#{classification_code},#{main_menu_code},#{main_menu_name},#{product_code},#{product_name},#{product_additional_description},#{product_price},#{discount_rate},#{discount_price},#{product_stock},#{is_available},#{is_sold_out_early},#{main_product_image1},#{main_product_image2},#{main_product_image3},#{product_detailed_description},now())
 	</insert>
 	
 	
@@ -118,7 +118,7 @@
                 </choose>
             </if>
         </where>
-        ORDER BY pidx DESC
+        ORDER BY pidx DESC LIMIT #{pageno} OFFSET #{startpg}
     </select>
     
 	<!-- 카테고리 리스트 출력, 검색 -->
@@ -142,16 +142,17 @@
 		</where>
 		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC
 	</select>
+	
 	<!-- cidx 리스트를 이용해서 main_menu_code 값을 찾는 쿼리 -->
 	<select id="find_main_menu_code" resultType="String">
-		SELECT main_menu_code FROM classification_code WHERE cidx IN
+		SELECT main_menu_name FROM classification_code WHERE cidx IN
 		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
 			#{item}
 		</foreach>
 	</select>
 	<!--  이미 카테고리에 등록된 상품이 있는지 확인하는 코드-->
-	<select id="find_exist_main_menu_code" resultType="int">
-		SELECT COUNT(*) FROM products WHERE main_menu_code IN
+	<select id="find_exist_main_menu_name" resultType="int">
+		SELECT COUNT(*) FROM products WHERE main_menu_name IN
 		<foreach item="item" index="index" collection="list" open="(" separator="," close=")" >
 			#{item}
 		</foreach>
@@ -171,4 +172,15 @@
 			#{item}
 		</foreach>
 	</delete>
+	
+	<!-- 상품 리스트 페이지 페이징 처리 -->
+	<select id="product_page" parameterType="Map" resultType="productsdao">
+		SELECT * FROM products
+		<where>
+			<if test="admin_id != 'master'">
+				admin_id =#{admin}
+			</if>
+		</where>
+		ORDER BY pidx DESC LIMIT #{pageno} OFFSET #{startpg}
+	</select>
 </mapper>

@@ -13,6 +13,7 @@ function ajax_data(){
 }
 ajax_data();
 
+//페이징
 var pageno = "";			//페이지 번호
 var uri = window.location.search;  		//웹 url 에 있는 ? 에 있는 파라미터 값 가져오기
 if(uri==""){	//최초 접속 시
