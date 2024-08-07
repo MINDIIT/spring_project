@@ -1,8 +1,3 @@
-var ck ="${search_part}";
-if(ck==""){
-	ck="1";
-}
-frm_search_btn.search_part.value=ck;
 
 $(function(){
 	
@@ -14,7 +9,7 @@ $(function(){
 		var dis_rate = $('#discount_rate').val();
 		if(ori_price && dis_rate){
 		//소수점 이하 반올림
-			var discount_price =ori_price- Math.round(ori_price * dis_rate / 100);
+			var discount_price = Math.round(ori_price * dis_rate / 100);
 			$('#discount_price').val(discount_price);
 		}	
 	}

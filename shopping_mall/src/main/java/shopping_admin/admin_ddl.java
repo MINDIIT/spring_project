@@ -25,20 +25,7 @@ public class admin_ddl extends md5_pass{
 	@Resource(name="Template2")
 	private SqlSessionTemplate tm2;
 	
-	//상품 리스트 출력 페이지
-	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
-		
-		List<products_dao> pl = new ArrayList<products_dao>();
-		Map< String, Object> search_data = new HashMap<String, Object>(); 
-		search_data.put("admin_id", admin_id);
-		search_data.put("search_part", search_part);
-		search_data.put("search_word", search_word);
-		search_data.put("startpg", startpg);
-		search_data.put("pageno", pageno);
-		
-		pl =tm2.selectList("shopping.product_list",search_data);
-		return pl;
-	}
+
 	
 	//재활용 가능한 페이징 처리
 	public List<products_dao> pageing_process(String admin_id,Integer startpg, Integer pageno, String use_where){
@@ -109,13 +96,13 @@ public class admin_ddl extends md5_pass{
 		}else {
 			switch (fieldname) {
 			case "main_product_image1":
-				dao.setMain_product_image1_path(null);
+				dao.setMain_product_image1(null);
 				break;
 			case "main_product_image2":
-				dao.setMain_product_image2_path(null);
+				dao.setMain_product_image2(null);
 				break;
 			case "main_product_image3":
-				dao.setMain_product_image3_path(null);
+				dao.setMain_product_image3(null);
 				break;
 			}
 		}
@@ -147,15 +134,35 @@ public class admin_ddl extends md5_pass{
 	}	
 	
 	//카테고리 리스트 출력
-	public List<cate_code_dao> cate_all_data(String admin_id,String search_part_category,String search_word_category){
+	public List<cate_code_dao> cate_all_data(String admin_id,String search_part_category,String search_word_category,Integer startpg, Integer pageno,boolean paginate){
 		List<cate_code_dao> cd = new ArrayList<cate_code_dao>();
-		Map< String, String> data = new HashMap<String, String>();
-		data.put("admin_id", admin_id);
-		data.put("search_part_category", search_part_category);
-		data.put("search_word_category", search_word_category);
+		Map< String, Object> data = new HashMap<String, Object>();
+		if(paginate) {
+			data.put("admin_id", admin_id);
+			data.put("search_part_category", search_part_category);
+			data.put("search_word_category", search_word_category);
+			data.put("pageno", pageno);
+			data.put("startpg", startpg);
+			cd = tm2.selectList("shopping.category_list_paginated",data);
+		}else {
+			cd = tm2.selectList("shopping.cate_all_data",admin_id);
+		}
 
-		cd = tm2.selectList("shopping.category_list",data);
 		return cd;
+	}
+	//상품 리스트 출력 페이지
+	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
+		
+		List<products_dao> pl = new ArrayList<products_dao>();
+		Map< String, Object> search_data = new HashMap<String, Object>(); 
+		search_data.put("admin_id", admin_id);
+		search_data.put("search_part", search_part);
+		search_data.put("search_word", search_word);
+		search_data.put("startpg", startpg);
+		search_data.put("pageno", pageno);
+		
+		pl =tm2.selectList("shopping.product_list",search_data);
+		return pl;
 	}
 	
 	//카테고리 데이터 갯수

@@ -1,6 +1,10 @@
+<%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
      <%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+	Date today = new Date();
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -19,7 +23,7 @@
 </head>
 <body>
 <script src="./js/jquery.js?v=1"></script>
-<script src="./js/product.js"></script>
+<script src="./js/product.js?v=<%=today%>"></script>
 <%@ include file="/admin/header.jsp" %>
 <main class="maincss">
 <section>
@@ -90,7 +94,7 @@
     <ul class="pageing">
         <li><img src="./ico/double_left.svg"></li>
         <li><img src="./ico/left.svg"></li>
-        <cr:set var="pg" value="${ctn /2+(1-((ctn/2)%1))%1} "/>
+        <cr:set var="pg" value="${(ctn / 2) + ((ctn % 2 == 0) ? 0 : 1)}" />
         <cr:forEach var="no" begin="1" end="${pg}" step="1">
         <li><a href="./product_list.do?page=${no}">${no}</a></li>
         </cr:forEach>
@@ -109,4 +113,11 @@
 </main>
 <%@ include file="/admin/footer.jsp" %>
 </body>
+<script>
+var ck ="${search_part}";
+if(ck==""){
+	ck="1";
+}
+frm_search_btn.search_part.value=ck;
+</script>
 </html>

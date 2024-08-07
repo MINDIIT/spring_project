@@ -121,8 +121,8 @@
         ORDER BY pidx DESC LIMIT #{pageno} OFFSET #{startpg}
     </select>
     
-	<!-- 카테고리 리스트 출력, 검색 -->
-	<select id="category_list" resultType="catecodedao" parameterType="Map">
+	<!-- 페이징 처리 된 카테고리 리스트 출력, 검색 , -->
+	<select id="category_list_paginated" resultType="catecodedao" parameterType="Map">
 		SELECT * FROM classification_code
 		<where>
 			menu_usage='Y'
@@ -140,8 +140,20 @@
 				</choose>
 			</if>
 		</where>
-		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC
+		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC LIMIT #{startpg}, #{pageno
 	</select>
+	
+	<!-- 상품잔체 데이터 출력 -->
+	<selext id="cate_all_data" resultType="catecodedao" parameterType="Map">
+		SELECT * FROM classification_code
+		<where>
+			menu_usage='Y'
+			<if test="admin_id != 'master'">
+				AND admin_id = #{admin_id}
+			</if>
+		</where>
+		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC		
+	</selext>
 	
 	<!-- cidx 리스트를 이용해서 main_menu_code 값을 찾는 쿼리 -->
 	<select id="find_main_menu_code" resultType="String">

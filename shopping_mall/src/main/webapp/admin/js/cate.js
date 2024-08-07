@@ -1,8 +1,4 @@
-var ck ="${search_part_category}";
-if(ck==""){
-	ck="1";
-}
-frm_search_cate.search_part_category.value=ck;
+
 $(function(){
 	////////     카테고리 리스트 페이지     ///////////////////////////////////
 	

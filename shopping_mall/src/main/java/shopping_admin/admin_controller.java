@@ -48,24 +48,6 @@ public class admin_controller {
 		return "cate_write";
 	}
 	
-	//카테고리 리스트 페이지 이동
-	@GetMapping("/admin/cate_list.do")
-	public String cate_list(Model m,@RequestParam(defaultValue = "",required = false)String search_part_category,@RequestParam(defaultValue = "",required = false)String search_word_category,HttpServletRequest req) {
-
-		try {
-			HttpSession hs =req.getSession();
-			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"),search_part_category,search_word_category);
-			int ctn = ad.cate_list_page((String)hs.getAttribute("admin_id"),search_part_category,search_word_category);
-			m.addAttribute("result",result);
-			m.addAttribute("ctn",ctn);
-			m.addAttribute("search_part_category",search_part_category);
-			m.addAttribute("search_word_category",search_word_category);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "cate_list";
-	}
 	
 	//상품등록 페이지 이동
 	@GetMapping("/admin/product_write.do")
@@ -73,7 +55,7 @@ public class admin_controller {
 		//분류코드 리스트 출력되어야함
 		try {
 			HttpSession hs =req.getSession();
-			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"),search_part_category,search_word_category);
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"),search_part_category,search_word_category,null,null,false);
 			m.addAttribute("result",result);
 			m.addAttribute("classification_code",result.get(0).getClassification_code());
 			
@@ -81,6 +63,31 @@ public class admin_controller {
 			System.out.println("db오류-1");
 		}
 		return "product_write";
+	}
+	//카테고리 리스트 페이지 이동
+	@GetMapping("/admin/cate_list.do")
+	public String cate_list(@RequestParam(value = "",required = false)Integer page,Model m,@RequestParam(defaultValue = "",required = false)String search_part_category,@RequestParam(defaultValue = "",required = false)String search_word_category,HttpServletRequest req) {
+		int pageno = 5;
+		int startpg=0;
+		
+		try {
+			if(page==null||page==1) {
+				startpg=0;
+			}else {
+				startpg = (page-1)*pageno;
+			}			
+			HttpSession hs =req.getSession();
+			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"),search_part_category,search_word_category,pageno,startpg, true);
+			int ctn = ad.cate_list_page((String)hs.getAttribute("admin_id"),search_part_category,search_word_category);
+			m.addAttribute("result",result);
+			m.addAttribute("ctn",ctn);
+			m.addAttribute("search_part_category",search_part_category);
+			m.addAttribute("search_word_category",search_word_category);
+			m.addAttribute("startpg",startpg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "cate_list";
 	}
 	
 	//상품 리스트 출력 페이지
