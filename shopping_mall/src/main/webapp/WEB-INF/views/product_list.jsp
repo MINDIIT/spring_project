@@ -90,6 +90,7 @@
     </ul>
     </cr:if>
 </div>
+ <cr:if test="${!empty result}">
 <div class="subpage_view3">
     <ul class="pageing">
         <li><img src="./ico/double_left.svg"></li>
@@ -102,6 +103,7 @@
         <li><img src="./ico/double_right.svg"></li>
     </ul>
 </div>
+</cr:if>
 <div class="subpage_view4">
     <input type="button" value="선택상품 삭제" title="선택상품 삭제" class="p_button" id="product_delete_btn">
     <span style="float: right;">

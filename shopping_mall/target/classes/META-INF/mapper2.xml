@@ -188,8 +188,8 @@
 	
 	<!-- 공지사항 게시글 등록 -->
 	<insert id="notice_insert" parameterType="noticedao" useGeneratedKeys="true" keyProperty="nidx">
-		insert into notice (admin_id,notice_title,notice_content,is_pinned,view_count,notice_create,notice_update)
-		values (#{admin_id},#{notice_title},#{notice_content},#{is_pinned},#{view_count},now(),now())
+		insert into notice (admin_id,admin_name,notice_title,notice_content,is_pinned,view_count,notice_create,notice_update)
+		values (#{admin_id},#{admin_name},#{notice_title},#{notice_content},#{is_pinned},#{view_count},now(),now())
 	</insert>
 	<insert id="notice_insert_attachments" parameterType="noticeattachmentsdao">
 		insert into notice_attachments(nidx,file_name,file_path,upload_time)
@@ -198,13 +198,23 @@
 	
 	<!-- 공지사항 게시글 리스트 출력 -->
 	<select id="notice_list" parameterType="Map" resultType="noticedao">
-		select * from notice 
+		SELECT * FROM notice
 		<where>
-			<if test="admin_id != 'master'">
+			<if test="admin_id !='master'">
 				admin_id =#{admin_id}
 			</if>
 		</where>
-		order by is_pinned desc, notice_reate desc LIMIT #{pageno},#{startpg}
+		ORDER BY is_pinned desc, notice_create desc LIMIT #{pageno},#{startpg}
+	</select>
+	
+	<!-- 공지사항 게시글 수 -->
+	<select id="notice_list_count" parameterType="Map" resultType="int">
+		SELECT COUNT(*) AS ctn FROM notice
+		<where>
+			<if test="admin_id !='master'">
+				admin_id =#{admin_id}
+			</if>
+		</where>
 	</select>
 	
 	<!-- 조회수 증가 -->

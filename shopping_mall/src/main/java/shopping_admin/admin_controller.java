@@ -126,6 +126,9 @@ public class admin_controller {
 			}			
 			HttpSession hs =req.getSession();
 		List<notice_dao> result = ad.notice_list((String)hs.getAttribute("admin_id"), startpg, pageno);
+		int ctn = ad.notice_list_count((String)hs.getAttribute("admin_id"));
+		System.out.println(result);
+		m.addAttribute("ctn",ctn);
 		m.addAttribute("result",result);
 		m.addAttribute("startpg",startpg);
 		

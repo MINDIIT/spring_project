@@ -25,14 +25,16 @@ public class admin_ddl extends md5_pass{
 	@Resource(name="Template2")
 	private SqlSessionTemplate tm2;
 	
+
 	
 
+	
+	
 	//공지사항 게시글 등록
 	public String  notice_insert(notice_dao dao, List<MultipartFile> files) {
 		String callback = "";
 		int result = tm2.insert("shopping.notice_insert",dao);
 		notice_attachments_dao attch_dao = new notice_attachments_dao();
-		System.out.println(dao.getIs_pinned());
 		int result2 = 0;
 			for(MultipartFile file :files) {
 				if(!file.isEmpty()) {
@@ -63,11 +65,17 @@ public class admin_ddl extends md5_pass{
 		return callback;
 	}
 	
+	//공지사항 리스트 갯수
+	public int notice_list_count(String admin_id) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("admin_id", admin_id);
+		int result = tm2.selectOne("shopping.notice_list_count",data);
+		return result;
+	}
+	
 	//상품 리스트 갯수 
 	public int product_list_ea(String admin_id,String search_part,String search_word) {
 		Map< String, String> data = new HashMap<String, String>();
-		System.out.println(admin_id+"1");
-		System.out.println(search_part);
 		data.put("admin_id", admin_id);
 		data.put("search_part", search_part);
 		data.put("search_word", search_word);
@@ -187,6 +195,8 @@ public class admin_ddl extends md5_pass{
 		pl =tm2.selectList("shopping.product_list",search_data);
 		return pl;
 	}
+	
+	//공지사항 리스트 출력
 	public List<notice_dao> notice_list(String admin_id,Integer startpg, Integer pageno){
 		
 		List<notice_dao> result = new ArrayList<notice_dao>();

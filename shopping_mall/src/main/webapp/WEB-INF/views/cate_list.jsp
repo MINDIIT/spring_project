@@ -69,6 +69,7 @@
     </cr:if>
     
 </div>
+ <cr:if test="${!empty result}">
 <div class="subpage_view3">
     <ul class="pageing">
         <li><img src="./ico/double_left.svg"></li>
@@ -81,6 +82,7 @@
         <li><img src="./ico/double_right.svg"></li>
     </ul>
 </div>
+</cr:if>
 <div class="subpage_view4">
     <input type="button" value="카테고리 삭제" title="카테고리 삭제" class="p_button" id="cate_delete_btn">
     <span style="float: right;">

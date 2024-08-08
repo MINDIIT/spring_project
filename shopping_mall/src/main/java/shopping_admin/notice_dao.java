@@ -9,6 +9,7 @@ public class notice_dao {
 	int nidx;
 	int view_count;
 	String admin_id;
+	String admin_name;
 	String notice_title;
 	String notice_content;
 	String is_pinned;

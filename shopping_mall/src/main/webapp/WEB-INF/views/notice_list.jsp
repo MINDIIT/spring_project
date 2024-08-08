@@ -1,6 +1,7 @@
 <%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>
  <%
 	Date today = new Date();
 %>    
@@ -36,31 +37,43 @@
         <li>날짜</li>
         <li>조회</li>
     </ul>
+    <cr:if test="${result!=null}">
+    <cr:set var="ino" value="${ctn}"/>
+    <cr:forEach var="data" items="${result}" varStatus="idx">
     <ol>
-        <li><input type="checkbox"></li>
-        <li>1</li>
-        <li>테스트 제목</li>
-        <li>관리자</li>
-        <li>2024-08-17</li>
-        <li>100</li>
+        <li><input type="checkbox"name="product_ck" value="${data.nidx}"></li>
+        <li>${ino-idx.index}</li>
+        <li>${data.notice_title}</li>
+        <li>${data.admin_name}</li>
+        <li>${data.notice_update}</li>
+        <li>${data.view_count}</li>
     </ol>
+    </cr:forEach>
+    </cr:if>
+    <cr:if test="${empty result}">
     <ol class="none_text">
         <li>등록된 공지 내용이 없습니다.</li>
     </ol>
+    </cr:if>
     </div>
     <div class="board_btn">
         <button class="border_del" id="notice_delete_btn">공지삭제</button>
         <button class="border_add" id="notice_write_btn">공지등록</button>
     </div>
+    <cr:if test="${!empty result}">
     <div class="border_page">
         <ul class="pageing">
             <li><img src="./ico/double_left.svg"></li>
             <li><img src="./ico/left.svg"></li>
-            <li>1</li>
+            <cr:set var="pg" value="${ctn/15+(1-((ctn/15)%1))%1}" />
+	        <cr:forEach var="no" begin="1" end="${pg}" step="1">
+            <li><a href="./notice_list.do?page=${no}">${no}</a></li>
+            </cr:forEach>
             <li><img src="./ico/right.svg"></li>
             <li><img src="./ico/double_right.svg"></li>
         </ul>
     </div>
+    </cr:if>
 </section>
 </main>
 <%@ include file="/admin/footer.jsp" %>
