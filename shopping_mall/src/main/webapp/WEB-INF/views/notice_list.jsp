@@ -1,5 +1,9 @@
+<%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+ <%
+	Date today = new Date();
+%>    
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -16,6 +20,8 @@
     <link rel="icon" href="./img/logo.png" sizes="32x32">
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
+<script src="./js/jquery.js?v=1"></script>
+<script src="./js/notice.js?v=<%=today%>"></script>
 <body>
 <%@ include file="/admin/header.jsp" %>
 <main class="maincss">
@@ -43,8 +49,8 @@
     </ol>
     </div>
     <div class="board_btn">
-        <button class="border_del">공지삭제</button>
-        <button class="border_add">공지등록</button>
+        <button class="border_del" id="notice_delete_btn">공지삭제</button>
+        <button class="border_add" id="notice_write_btn">공지등록</button>
     </div>
     <div class="border_page">
         <ul class="pageing">

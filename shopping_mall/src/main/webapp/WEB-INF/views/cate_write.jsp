@@ -23,7 +23,7 @@
 <main class="maincss">
 <section>
 <form id="frm_cate_add" method="post" action="./cateaddok.do">
-<input type="hidden" value="${admin_id}" name="admin_id">
+<input type="hidden" value="<%=admin_id%>" name="admin_id">
     <p>카테고리 등록 페이지</p>
     <div class="cate_insert">
         <ul>

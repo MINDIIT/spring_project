@@ -10,5 +10,7 @@
 		<typeAlias alias="paymentdao" type="shopping_admin.payment_delivery_settings_dao"/>
 		<typeAlias alias="catecodedao" type="shopping_admin.cate_code_dao"/>
 		<typeAlias alias="productsdao" type="shopping_admin.products_dao"/>
+		<typeAlias alias="noticedao" type="shopping_admin.notice_dao"/>
+		<typeAlias alias="noticeattachmentsdao" type="shopping_admin.notice_attachments_dao"/>
 	</typeAliases>
 </configuration>

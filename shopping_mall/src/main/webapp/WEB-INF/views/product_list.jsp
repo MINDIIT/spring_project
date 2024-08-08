@@ -94,7 +94,7 @@
     <ul class="pageing">
         <li><img src="./ico/double_left.svg"></li>
         <li><img src="./ico/left.svg"></li>
-        <cr:set var="pg" value="${(ctn / 2) + ((ctn % 2 == 0) ? 0 : 1)}" />
+        <cr:set var="pg" value="${ctn/5+(1-((ctn/5)%1))%1}" />
         <cr:forEach var="no" begin="1" end="${pg}" step="1">
         <li><a href="./product_list.do?page=${no}">${no}</a></li>
         </cr:forEach>

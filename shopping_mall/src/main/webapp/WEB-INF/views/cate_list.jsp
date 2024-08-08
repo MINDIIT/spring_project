@@ -73,7 +73,10 @@
     <ul class="pageing">
         <li><img src="./ico/double_left.svg"></li>
         <li><img src="./ico/left.svg"></li>
-        <li>1</li>
+        <cr:set var="pg" value="${ctn/5+(1-((ctn/5)%1))%1}" />
+        <cr:forEach var="no" begin="1" end="${pg}" step="1">
+        <li><a href="./cate_list.do?page=${no}">${no}</a></li>
+        </cr:forEach>
         <li><img src="./ico/right.svg"></li>
         <li><img src="./ico/double_right.svg"></li>
     </ul>

@@ -25,24 +25,49 @@ public class admin_ddl extends md5_pass{
 	@Resource(name="Template2")
 	private SqlSessionTemplate tm2;
 	
-
 	
-	//재활용 가능한 페이징 처리
-	public List<products_dao> pageing_process(String admin_id,Integer startpg, Integer pageno, String use_where){
-		List<products_dao> pageing_data = null;
-		Map<String, Object> page = new HashMap<String, Object>();
-		page.put("admin_id", admin_id);
-		page.put("startpg", startpg);
-		page.put("pageno", pageno);
-		if(use_where.equals("product_list")) {
-			pageing_data = tm2.selectList("shopping.product_page",page);
+
+	//공지사항 게시글 등록
+	public String  notice_insert(notice_dao dao, List<MultipartFile> files) {
+		String callback = "";
+		int result = tm2.insert("shopping.notice_insert",dao);
+		notice_attachments_dao attch_dao = new notice_attachments_dao();
+		System.out.println(dao.getIs_pinned());
+		int result2 = 0;
+			for(MultipartFile file :files) {
+				if(!file.isEmpty()) {
+					String filename = file.getOriginalFilename();
+					String filepath = "/upload/"+filename;
+					File f = new File(filepath);
+					try {
+						file.transferTo(f);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					attch_dao.setNidx(dao.getNidx());
+					attch_dao.setFile_name(filename);
+					attch_dao.setFile_path(filepath);
+					result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
+					}else {
+						attch_dao.setNidx(dao.getNidx());
+						attch_dao.setFile_name(null);
+						attch_dao.setFile_path(null);
+						result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
+					}
+				}
+		if(result>0 && result2>0) {
+			callback = "ok";
+		}else {
+			callback = "no";
 		}
-		
-		return pageing_data;
+		return callback;
 	}
+	
 	//상품 리스트 갯수 
 	public int product_list_ea(String admin_id,String search_part,String search_word) {
 		Map< String, String> data = new HashMap<String, String>();
+		System.out.println(admin_id+"1");
+		System.out.println(search_part);
 		data.put("admin_id", admin_id);
 		data.put("search_part", search_part);
 		data.put("search_word", search_word);
@@ -137,22 +162,20 @@ public class admin_ddl extends md5_pass{
 	public List<cate_code_dao> cate_all_data(String admin_id,String search_part_category,String search_word_category,Integer startpg, Integer pageno,boolean paginate){
 		List<cate_code_dao> cd = new ArrayList<cate_code_dao>();
 		Map< String, Object> data = new HashMap<String, Object>();
-		if(paginate) {
-			data.put("admin_id", admin_id);
-			data.put("search_part_category", search_part_category);
-			data.put("search_word_category", search_word_category);
-			data.put("pageno", pageno);
-			data.put("startpg", startpg);
+		data.put("admin_id", admin_id);
+		data.put("search_part_category", search_part_category);
+		data.put("search_word_category", search_word_category);
+		data.put("pageno", pageno);
+		data.put("startpg", startpg);
+		if(paginate) { //카테고리 리스트 페이지의 페이징처리 + 검색 기능 된 리스트 출력
 			cd = tm2.selectList("shopping.category_list_paginated",data);
-		}else {
-			cd = tm2.selectList("shopping.cate_all_data",admin_id);
+		}else { //상품 등록 페이지 카테고리 선택을 위한 전체 출력
+			cd = tm2.selectList("shopping.cate_all_data",data);
 		}
-
 		return cd;
 	}
 	//상품 리스트 출력 페이지
 	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
-		
 		List<products_dao> pl = new ArrayList<products_dao>();
 		Map< String, Object> search_data = new HashMap<String, Object>(); 
 		search_data.put("admin_id", admin_id);
@@ -164,6 +187,18 @@ public class admin_ddl extends md5_pass{
 		pl =tm2.selectList("shopping.product_list",search_data);
 		return pl;
 	}
+	public List<notice_dao> notice_list(String admin_id,Integer startpg, Integer pageno){
+		
+		List<notice_dao> result = new ArrayList<notice_dao>();
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("admin_id", admin_id);
+		data.put("startpg", startpg);
+		data.put("pageno", pageno);
+		result = tm2.selectList("shopping.notice_list",data);
+		
+		return result;
+	}
+	
 	
 	//카테고리 데이터 갯수
 	public int cate_list_page(String admin_id,String search_part_category,String search_word_category) {

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class admin_controller {
@@ -26,12 +27,6 @@ public class admin_controller {
 	@Resource(name="admin")
 	private admin_ddl ad;
 
-	//공지사항 리스트 페이지로 이동
-	@GetMapping("/admin/notice_list.do")
-	public String notice_list () {
-		
-		return "notice_list";
-	}
 	
 	//일반회원 리스트 페이지
 	@GetMapping("/admin/shop_member_list.do")
@@ -39,12 +34,42 @@ public class admin_controller {
 		return "shop_member_list";
 	}
 	
+	//공지사항 등록 페이지 이동
+	@GetMapping("/admin/notice_write.do")
+	public String notice_writeok() {
+		
+		return "notice_write";
+	}
+	
+	//공지사항 게시물 등록
+	@PostMapping("/admin/notice_insertok.do")
+	public String notice_insertok(@ModelAttribute notice_dao dao,@RequestParam("nfile") List<MultipartFile> files,HttpServletResponse res)throws Exception {
+		res.setContentType("text/html;charset=utf-8");	
+		this.pw = res.getWriter();
+		String result = "";
+		System.out.println(dao.getIs_pinned());
+		result = ad.notice_insert(dao, files);
+		try {
+			if(result.equals("ok")) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 공지사항이 등록되었습니다.');"
+						+ "location.href='./notice_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("여기에러??!!");
+			this.pw.print("<script>"
+					+ "alert('오류로 인해 요청하신 작업을 처리하지 못했습니다.');"
+					+ "history.go(-1);"
+					+ "</script>");
+		}	
+		return null;
+	}
+	
 	//카테고리 등록 페이지
 	@GetMapping("/admin/cate_write.do")
-	public String cate_write(HttpServletRequest req,Model m) {
-		HttpSession hs =req.getSession();
-		String admin_id = (String)hs.getAttribute("admin_id");
-		m.addAttribute("admin_id",admin_id);	
+	public String cate_write() {	
 		return "cate_write";
 	}
 	
@@ -60,6 +85,7 @@ public class admin_controller {
 			m.addAttribute("classification_code",result.get(0).getClassification_code());
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("db오류-1");
 		}
 		return "product_write";
@@ -69,7 +95,6 @@ public class admin_controller {
 	public String cate_list(@RequestParam(value = "",required = false)Integer page,Model m,@RequestParam(defaultValue = "",required = false)String search_part_category,@RequestParam(defaultValue = "",required = false)String search_word_category,HttpServletRequest req) {
 		int pageno = 5;
 		int startpg=0;
-		
 		try {
 			if(page==null||page==1) {
 				startpg=0;
@@ -89,6 +114,23 @@ public class admin_controller {
 		}
 		return "cate_list";
 	}
+	//공지사항 리스트 페이지로 이동
+	@GetMapping("/admin/notice_list.do")
+	public String notice_list (@RequestParam(value = "",required = false)Integer page,Model m,HttpServletRequest req) {
+		int pageno = 15;
+		int startpg=0;
+			if(page==null||page==1) {
+				startpg=0;
+			}else {
+				startpg = (page-1)*pageno;
+			}			
+			HttpSession hs =req.getSession();
+		List<notice_dao> result = ad.notice_list((String)hs.getAttribute("admin_id"), startpg, pageno);
+		m.addAttribute("result",result);
+		m.addAttribute("startpg",startpg);
+		
+		return "notice_list";
+	}
 	
 	//상품 리스트 출력 페이지
 	@GetMapping("/admin/product_list.do")
@@ -103,11 +145,9 @@ public class admin_controller {
 			}else {
 				startpg = (page-1)*pageno;
 			}
-			
 			//검색 기능
 			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word,pageno,startpg);
-				int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);			
-				
+			int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);				
 				m.addAttribute("result",result);
 				m.addAttribute("ctn",ctn);
 				m.addAttribute("search_part",search_part);
@@ -198,7 +238,6 @@ public class admin_controller {
 	public String product_insertok(@ModelAttribute products_dao dao, HttpServletResponse res, HttpServletRequest req)throws Exception{
 		res.setContentType("text/html;charset=utf-8");	
 		this.pw = res.getWriter();
-		System.out.println(dao.getMain_menu_code());
 		try {
 			int result = ad.product_insert(dao,req);
 			if(result>0) {

@@ -118,7 +118,7 @@
                 </choose>
             </if>
         </where>
-        ORDER BY pidx DESC LIMIT #{pageno} OFFSET #{startpg}
+        ORDER BY pidx DESC LIMIT #{pageno},#{startpg}
     </select>
     
 	<!-- 페이징 처리 된 카테고리 리스트 출력, 검색 , -->
@@ -140,11 +140,11 @@
 				</choose>
 			</if>
 		</where>
-		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC LIMIT #{startpg}, #{pageno
+		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC LIMIT #{pageno},#{startpg}
 	</select>
 	
-	<!-- 상품잔체 데이터 출력 -->
-	<selext id="cate_all_data" resultType="catecodedao" parameterType="Map">
+	<!-- 카테고리 전체 데이터 출력-(상품 등록 페이지에 옵션에 쓰임) -->
+	<select id="cate_all_data" resultType="catecodedao" parameterType="Map">
 		SELECT * FROM classification_code
 		<where>
 			menu_usage='Y'
@@ -153,7 +153,7 @@
 			</if>
 		</where>
 		ORDER BY admin_id ASC, classification_code ASC, main_menu_code ASC		
-	</selext>
+	</select>
 	
 	<!-- cidx 리스트를 이용해서 main_menu_code 값을 찾는 쿼리 -->
 	<select id="find_main_menu_code" resultType="String">
@@ -184,15 +184,31 @@
 			#{item}
 		</foreach>
 	</delete>
+
 	
-	<!-- 상품 리스트 페이지 페이징 처리 -->
-	<select id="product_page" parameterType="Map" resultType="productsdao">
-		SELECT * FROM products
+	<!-- 공지사항 게시글 등록 -->
+	<insert id="notice_insert" parameterType="noticedao" useGeneratedKeys="true" keyProperty="nidx">
+		insert into notice (admin_id,notice_title,notice_content,is_pinned,view_count,notice_create,notice_update)
+		values (#{admin_id},#{notice_title},#{notice_content},#{is_pinned},#{view_count},now(),now())
+	</insert>
+	<insert id="notice_insert_attachments" parameterType="noticeattachmentsdao">
+		insert into notice_attachments(nidx,file_name,file_path,upload_time)
+		values (#{nidx},#{file_name},#{file_path},now())
+	</insert>
+	
+	<!-- 공지사항 게시글 리스트 출력 -->
+	<select id="notice_list" parameterType="Map" resultType="noticedao">
+		select * from notice 
 		<where>
 			<if test="admin_id != 'master'">
-				admin_id =#{admin}
+				admin_id =#{admin_id}
 			</if>
 		</where>
-		ORDER BY pidx DESC LIMIT #{pageno} OFFSET #{startpg}
+		order by is_pinned desc, notice_reate desc LIMIT #{pageno},#{startpg}
 	</select>
+	
+	<!-- 조회수 증가 -->
+	<update id="notice_count_view">
+		update notice set view_count = view_count + 1 where nidx=#{nidx}
+	</update>
 </mapper>
