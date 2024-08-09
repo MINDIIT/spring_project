@@ -177,6 +177,7 @@
 			#{item}
 		</foreach>
 	</delete>
+	
 	<!-- 상품 삭제 -->
 	<delete id="product_delete" parameterType="list">
 		DELETE FROM products WHERE pidx IN
@@ -184,12 +185,44 @@
 			#{item}
 		</foreach>
 	</delete>
-
+	
+	<!-- 상품 등록 시 첨부된 첨부파일 경로 조회 -->
+	<select id="select_file_path_products" resultType="Map" parameterType="List">
+		SELECT main_product_image1, main_product_image2, main_product_image3
+		FROM products
+		WHERE pidx IN 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<!-- 공지사항 삭제시 첨부된 첨부파일 경로 조회 -->
+	<select id="select_file_path_notice" resultType="Map" parameterType="list">
+		SELECT file_name FROM notice_attachments WHERE nidx IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")" >
+			#{item}
+		</foreach>
+	</select>
+	
+	<!-- 공지사항 삭제 -->
+	<delete id="notice_delete" parameterType="list">
+		DELETE FROM notice WHERE nidx IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 공지사항 첨부파일 삭제 -->
+	<delete id="notice_attachments_delete" parameterType="list">
+		DELETE from notice_attachments WHERE nidx IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
 	
 	<!-- 공지사항 게시글 등록 -->
 	<insert id="notice_insert" parameterType="noticedao" useGeneratedKeys="true" keyProperty="nidx">
-		insert into notice (admin_id,notice_title,notice_content,is_pinned,view_count,notice_create,notice_update)
-		values (#{admin_id},#{notice_title},#{notice_content},#{is_pinned},#{view_count},now(),now())
+		insert into notice (admin_id,admin_name,notice_title,notice_content,is_pinned,view_count,notice_create,notice_update)
+		values (#{admin_id},#{admin_name},#{notice_title},#{notice_content},#{is_pinned},#{view_count},now(),now())
 	</insert>
 	<insert id="notice_insert_attachments" parameterType="noticeattachmentsdao">
 		insert into notice_attachments(nidx,file_name,file_path,upload_time)
@@ -197,18 +230,41 @@
 	</insert>
 	
 	<!-- 공지사항 게시글 리스트 출력 -->
-	<select id="notice_list" parameterType="Map" resultType="noticedao">
-		select * from notice 
+	<select id="notice_list" parameterType="map" resultType="noticedao">
+		SELECT * FROM notice 
 		<where>
 			<if test="admin_id != 'master'">
 				admin_id =#{admin_id}
 			</if>
 		</where>
-		order by is_pinned desc, notice_reate desc LIMIT #{pageno},#{startpg}
+		ORDER BY is_pinned asc, notice_create DESC limit #{startpg},#{pageno}
+	</select>
+	
+	
+	<!-- 공지사항 게시글 리스트 갯수 -->
+	<select id="notice_list_count" parameterType="Map" resultType="int">
+		SELECT COUNT(*) AS ctn FROM notice
+		<where>
+			<if test="admin_id != 'master'">
+				admin_id =#{admin_id}
+			</if>		
+		</where>
 	</select>
 	
 	<!-- 조회수 증가 -->
 	<update id="notice_count_view">
 		update notice set view_count = view_count + 1 where nidx=#{nidx}
 	</update>
+	
+	<!-- 쇼핑몰 회원 리스트 출력 -->
+	<select id="select_shop_member">
+		SELECT * FROM member
+		<where>
+			<if test="">
+			
+			</if>
+		</where>
+	
+	</select>
+	
 </mapper>

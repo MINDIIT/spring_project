@@ -29,38 +29,54 @@
     <p>공지사항 관리페이지</p>
     <div class="subpage_view">
     <ul>
-        <li><input type="checkbox"></li>
+        <li><input type="checkbox" id="notice_all_ck"></li>
         <li>NO</li>
         <li>제목</li>
         <li>글쓴이</li>
         <li>날짜</li>
         <li>조회</li>
     </ul>
+    <cr:if test="${result!=null}">
+    <cr:set var="ino" value="${ctn-startpg}"/>
+    <cr:forEach var="data" items="${result}" step="1" varStatus="idx">
     <ol>
-        <li><input type="checkbox"></li>
-        <li>1</li>
-        <li>테스트 제목</li>
-        <li>관리자</li>
-        <li>2024-08-17</li>
-        <li>100</li>
+        <li><input type="checkbox" name="notice_ck" value="${data.nidx}"></li>
+        <li>${ino-idx.index}</li>
+        <li>
+        	<a href="notice_view.do?nidx=${data.nidx}">
+        		${data.notice_title}
+        	</a>
+        </li>
+        <li>${data.admin_name}</li>
+        <li>${data.notice_update.substring(0, 10)}</li>
+        <li>${data.view_count}</li>
     </ol>
+    </cr:forEach>
+    </cr:if>
+    <cr:if test="${empty result}">
     <ol class="none_text">
         <li>등록된 공지 내용이 없습니다.</li>
     </ol>
+    </cr:if>
     </div>
     <div class="board_btn">
         <button class="border_del" id="notice_delete_btn">공지삭제</button>
         <button class="border_add" id="notice_write_btn">공지등록</button>
     </div>
+    <cr:if test="${!empty result}">
     <div class="border_page">
         <ul class="pageing">
             <li><img src="./ico/double_left.svg"></li>
             <li><img src="./ico/left.svg"></li>
-            <li>1</li>
+            <cr:set var="pg" value="${ctn/5+(1-((ctn/5)%1))%1}" />
+            <cr:forEach var="no" begin="1" end="${pg}" step="1">
+            <li><a href="./notice_list.do?page=${no}">${no}</a></li>
+            </cr:forEach>
             <li><img src="./ico/right.svg"></li>
             <li><img src="./ico/double_right.svg"></li>
         </ul>
     </div>
+	</cr:if>
 </section>
 </main>
 <%@ include file="/admin/footer.jsp" %>

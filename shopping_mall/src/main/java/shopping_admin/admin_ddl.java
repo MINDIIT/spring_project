@@ -26,43 +26,6 @@ public class admin_ddl extends md5_pass{
 	private SqlSessionTemplate tm2;
 	
 	
-
-	//공지사항 게시글 등록
-	public String  notice_insert(notice_dao dao, List<MultipartFile> files) {
-		String callback = "";
-		int result = tm2.insert("shopping.notice_insert",dao);
-		notice_attachments_dao attch_dao = new notice_attachments_dao();
-		System.out.println(dao.getIs_pinned());
-		int result2 = 0;
-			for(MultipartFile file :files) {
-				if(!file.isEmpty()) {
-					String filename = file.getOriginalFilename();
-					String filepath = "/upload/"+filename;
-					File f = new File(filepath);
-					try {
-						file.transferTo(f);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					attch_dao.setNidx(dao.getNidx());
-					attch_dao.setFile_name(filename);
-					attch_dao.setFile_path(filepath);
-					result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
-					}else {
-						attch_dao.setNidx(dao.getNidx());
-						attch_dao.setFile_name(null);
-						attch_dao.setFile_path(null);
-						result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
-					}
-				}
-		if(result>0 && result2>0) {
-			callback = "ok";
-		}else {
-			callback = "no";
-		}
-		return callback;
-	}
-	
 	//상품 리스트 갯수 
 	public int product_list_ea(String admin_id,String search_part,String search_word) {
 		Map< String, String> data = new HashMap<String, String>();
@@ -76,11 +39,45 @@ public class admin_ddl extends md5_pass{
 		return result;
 	}
 	//상품 삭제
-	public int product_delete(String pidx) {
+	public int product_delete(String pidx,HttpServletRequest req) {
 		String[] pidxdata = pidx.split(",");
 		List<String> pidx_data = Arrays.asList(pidxdata);
+		//첨부파일 경로 조회
+		List<Map<String, String>> filepath = tm2.selectList("shopping.select_file_path_products",pidx_data);
+		//실제 파일 삭제
+		for(Map<String, String> filepaths : filepath) {
+			deletefile(filepaths.get("main_product_image1"),req);
+			deletefile(filepaths.get("main_product_image2"),req);
+			deletefile(filepaths.get("main_product_image3"),req);
+		}
 		int result = tm2.delete("shopping.product_delete",pidx_data);
 		return result;
+	}
+	//공지사항 삭제
+	public int notice_delete(String nidx,HttpServletRequest req) {
+		String callback = "";
+		String[] nidxdata = nidx.split(",");
+		List<String> nidx_data = Arrays.asList(nidxdata);
+		//첨부파일 경로 조회
+		List<Map<String, String>> filepath = tm2.selectList("shopping.select_file_path_notice",nidx_data);
+		//실제 파일 삭제
+		for(Map<String, String> filepaths : filepath) {
+			deletefile(filepaths.get("file_name"),req);
+		}
+		//공지사항 삭제
+		int result = tm2.delete("shopping.notice_delete",nidx_data);
+		return result;
+	}
+	
+	//파일 삭제 메소드
+	private void deletefile(String filepath,HttpServletRequest req) {
+		String url = req.getServletContext().getRealPath("/upload/");
+		if(filepath != null && !filepath.isEmpty()) {
+			File file = new File(url+filepath);
+			if(file.exists()) {
+				file.delete();
+			}
+		}
 	}
 	
 	//상품 등록
@@ -102,17 +99,17 @@ public class admin_ddl extends md5_pass{
 				file.transferTo(new File(url+file.getOriginalFilename()));
 				
 				//db에 경로 저장
-				String uploadurl = "./upload/"+file.getOriginalFilename();
+				String filename =file.getOriginalFilename();
 				
 				switch (fieldname) {
 				case "main_product_image1":
-					dao.setMain_product_image1(uploadurl);
+					dao.setMain_product_image1(filename);
 					break;
 				case "main_product_image2":
-					dao.setMain_product_image2(uploadurl);
+					dao.setMain_product_image2(filename);
 					break;
 				case "main_product_image3":
-					dao.setMain_product_image3(uploadurl);
+					dao.setMain_product_image3(filename);
 					break;
 				}
 			} catch (Exception e) {
@@ -131,6 +128,19 @@ public class admin_ddl extends md5_pass{
 				break;
 			}
 		}
+	}
+	//상품 리스트 출력 페이지
+	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
+		List<products_dao> pl = new ArrayList<products_dao>();
+		Map< String, Object> search_data = new HashMap<String, Object>(); 
+		search_data.put("admin_id", admin_id);
+		search_data.put("search_part", search_part);
+		search_data.put("search_word", search_word);
+		search_data.put("startpg", startpg);
+		search_data.put("pageno", pageno);
+		
+		pl =tm2.selectList("shopping.product_list",search_data);
+		return pl;
 	}
 	
 	//카테고리 등록
@@ -174,32 +184,6 @@ public class admin_ddl extends md5_pass{
 		}
 		return cd;
 	}
-	//상품 리스트 출력 페이지
-	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
-		List<products_dao> pl = new ArrayList<products_dao>();
-		Map< String, Object> search_data = new HashMap<String, Object>(); 
-		search_data.put("admin_id", admin_id);
-		search_data.put("search_part", search_part);
-		search_data.put("search_word", search_word);
-		search_data.put("startpg", startpg);
-		search_data.put("pageno", pageno);
-		
-		pl =tm2.selectList("shopping.product_list",search_data);
-		return pl;
-	}
-	public List<notice_dao> notice_list(String admin_id,Integer startpg, Integer pageno){
-		
-		List<notice_dao> result = new ArrayList<notice_dao>();
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("admin_id", admin_id);
-		data.put("startpg", startpg);
-		data.put("pageno", pageno);
-		result = tm2.selectList("shopping.notice_list",data);
-		
-		return result;
-	}
-	
-	
 	//카테고리 데이터 갯수
 	public int cate_list_page(String admin_id,String search_part_category,String search_word_category) {
 		Map< String, String> data = new HashMap<String, String>();
@@ -207,6 +191,61 @@ public class admin_ddl extends md5_pass{
 		data.put("search_part_category", search_part_category);
 		data.put("search_word_category", search_word_category);
 		int result = tm2.selectOne("shopping.category_count",data);
+		return result;
+	}
+	
+	//공지사항 게시글 등록
+	public String  notice_insert(notice_dao dao, List<MultipartFile> files,HttpServletRequest req) {
+		String callback = "";
+		int result = tm2.insert("shopping.notice_insert",dao);
+		notice_attachments_dao attch_dao = new notice_attachments_dao();
+		int result2 = 0;
+			for(MultipartFile file :files) {
+				if(!file.isEmpty()) {
+					String url = req.getServletContext().getRealPath("/upload/");
+					String filename = file.getOriginalFilename();
+					String filepath = url+filename;
+					File f = new File(filepath);
+					try {
+						file.transferTo(f);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					attch_dao.setNidx(dao.getNidx());
+					attch_dao.setFile_name(filename);
+					attch_dao.setFile_path(filepath);
+					result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
+					}else {
+						attch_dao.setNidx(dao.getNidx());
+						attch_dao.setFile_name(null);
+						attch_dao.setFile_path(null);
+						result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
+					}
+				}
+		if(result>0 && result2>0) {
+			callback = "ok";
+		}else {
+			callback = "no";
+		}
+		return callback;
+	}
+	
+	//공지사항 게시글 리스트 출력
+	public List<notice_dao> notice_list(String admin_id,Integer startpg, Integer pageno){
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("admin_id", admin_id);
+		data.put("startpg", startpg);
+		data.put("pageno", pageno);
+		List<notice_dao> result = tm2.selectList("shopping.notice_list",data);
+		return result;
+	}
+	
+	//공지사항 게시물 갯수
+	public int notice_list_count(String admin_id) {
+		Map< String, Object> data = new HashMap<String, Object>();
+		data.put("admin_id", admin_id);
+		int result = tm2.selectOne("shopping.notice_list_count",data);
 		return result;
 	}
 	

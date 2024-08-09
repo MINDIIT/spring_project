@@ -43,12 +43,11 @@ public class admin_controller {
 	
 	//공지사항 게시물 등록
 	@PostMapping("/admin/notice_insertok.do")
-	public String notice_insertok(@ModelAttribute notice_dao dao,@RequestParam("nfile") List<MultipartFile> files,HttpServletResponse res)throws Exception {
+	public String notice_insertok(@ModelAttribute notice_dao dao,@RequestParam("nfile") List<MultipartFile> files,HttpServletResponse res,HttpServletRequest req)throws Exception {
 		res.setContentType("text/html;charset=utf-8");	
 		this.pw = res.getWriter();
 		String result = "";
-		System.out.println(dao.getIs_pinned());
-		result = ad.notice_insert(dao, files);
+		result = ad.notice_insert(dao, files,req);
 		try {
 			if(result.equals("ok")) {
 				this.pw.print("<script>"
@@ -114,6 +113,14 @@ public class admin_controller {
 		}
 		return "cate_list";
 	}
+	
+	//공지사항 view 페이지 이동
+	@GetMapping("/admin/notice_view.do")
+	public String notice_viewpage(String nidx,HttpServletResponse res) {
+		
+		return null;
+	}
+	
 	//공지사항 리스트 페이지로 이동
 	@GetMapping("/admin/notice_list.do")
 	public String notice_list (@RequestParam(value = "",required = false)Integer page,Model m,HttpServletRequest req) {
@@ -126,10 +133,12 @@ public class admin_controller {
 			}			
 			HttpSession hs =req.getSession();
 		List<notice_dao> result = ad.notice_list((String)hs.getAttribute("admin_id"), startpg, pageno);
+		int ctn = ad.notice_list_count((String)hs.getAttribute("admin_id"));
+		m.addAttribute("ctn",ctn);
 		m.addAttribute("result",result);
 		m.addAttribute("startpg",startpg);
 		
-		return "notice_list";
+		return "/notice_list";
 	}
 	
 	//상품 리스트 출력 페이지
@@ -176,11 +185,11 @@ public class admin_controller {
 	
 	//상품 삭제
 	@GetMapping("/admin/product_delete.do")
-	public String product_deleteok(String pidx,HttpServletResponse res)throws Exception {
+	public String product_deleteok(String pidx,HttpServletResponse res,HttpServletRequest req)throws Exception {
 		res.setContentType("text/html;charset=utf-8");	
 		this.pw = res.getWriter();
 		try {
-			int result = ad.product_delete(pidx);
+			int result = ad.product_delete(pidx,req);
 			if(result>0) {
 				this.pw.write("<script>"
 						+ "alert('정상적으로 상품이 삭제되었습니다.');"
@@ -193,6 +202,30 @@ public class admin_controller {
 					+ "alert('오류로 인해 요청하신 작업을 수행하지못했습니다.');"
 					+ "location.href='./product_list.do';"
 					+ "</script>");
+		}
+		return null;
+	}
+	
+	//공지사항 게시글 삭제
+	@GetMapping("/admin/notice_delete.do")
+	public String notice_deleteok(String nidx,HttpServletResponse res,HttpServletRequest req)throws Exception{
+		res.setContentType("text/html;charset=utf-8");
+		this.pw = res.getWriter();
+		try {
+			int result = ad.notice_delete(nidx, req);
+			System.out.println(result);
+			if(result>0) {
+				this.pw.write("<script>"
+						+ "alert('게시글이 정상적으로 삭제되었습니다.');"
+						+ "location.href='./notice_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.write("<script>"
+					+ "alert('오류로 인해 요청하신 작업을 수행하지못했습니다.');"
+					+ "location.href='./notice_list.do';"
+					+ "</script>");			
 		}
 		return null;
 	}
