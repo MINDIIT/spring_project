@@ -1,5 +1,9 @@
+<%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+ <%
+	Date today = new Date();
+%>      
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -8,6 +12,8 @@
     <link href="../mallpage/css/index.css" rel="stylesheet" />
     <link href="../mallpage/css/subpage.css" rel="stylesheet" />
     <link href="../mallpage/css/agree.css?v=1" rel="stylesheet" />
+    <script src="./js/jquery.js?v=1"></script>
+	<script src="./js/mall.js?v=<%=today%>"></script>
   </head>
 
   <body>

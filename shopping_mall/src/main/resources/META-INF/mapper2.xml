@@ -13,10 +13,15 @@
 	<update id="agree" parameterType="Map">
 		update admin_user set admin_confirm=#{admin_confirm} where aidx=#{aidx}
 	</update>
-	<!-- 관리자 승인 대기 리스트 출력 -->
+	<!-- 관리자 승인리스트 출력 -->
 	<select id="standby_list" resultType="admindao">
 		select * from admin_user order by aidx desc
 	</select>
+	<!-- 관리자 수  -->
+	<select id="admin_list_count" resultType="int">
+		SELECT COUNT(*) AS ctn FROM admin_user
+	</select>
+	
 	<!-- 관리자 추가 승인대기 -->
 	<insert id="admin_standbyadd" parameterType="admindao">
 		insert into admin_user (aidx,admin_id,admin_pass,admin_name,admin_email,admin_hp,admin_team,admin_position,admin_confirm,admin_join)
@@ -224,6 +229,8 @@
 		insert into notice (admin_id,admin_name,notice_title,notice_content,is_pinned,view_count,notice_create,notice_update)
 		values (#{admin_id},#{admin_name},#{notice_title},#{notice_content},#{is_pinned},#{view_count},now(),now())
 	</insert>
+	
+	<!-- 공지사항 등록 - 첨부파일 -->
 	<insert id="notice_insert_attachments" parameterType="noticeattachmentsdao">
 		insert into notice_attachments(nidx,file_name,file_path,upload_time)
 		values (#{nidx},#{file_name},#{file_path},now())
@@ -240,6 +247,21 @@
 		ORDER BY is_pinned asc, notice_create DESC limit #{startpg},#{pageno}
 	</select>
 	
+	<!-- 공지사항 게시글 view page 출력 -->
+	<select id="notice_view" parameterType="Map" resultType="noticedao">
+		SELECT * FROM notice
+		<where>
+			nidx =#{nidx}
+			<if test="admin_id != 'master'">
+				AND admin_id =#{admin_id}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 공지사항 게시글 view page 첨부파일 출력 -->
+	<select id="notice_view_attach" parameterType="Map" resultType="noticeattachmentsdao">
+		SELECT * FROM notice_attachments WHERE nidx=#{nidx}
+	</select>
 	
 	<!-- 공지사항 게시글 리스트 갯수 -->
 	<select id="notice_list_count" parameterType="Map" resultType="int">
@@ -251,9 +273,35 @@
 		</where>
 	</select>
 	
+	<!-- 공지사항 수정 페이지 - 공지사항 수정 -->
+	<update id="update_notice" parameterType="noticedao">
+		UPDATE notice SET notice_title = #{notice_title},
+						notice_content = #{notice_content},
+						is_pinned = #{is_pinned},
+						notice_update = now()
+						WHERE nidx = #{nidx}	
+	</update>
+	
+	<!-- 공지사항 수정 페이지 - 첨부파일 삭제(파일 경로 이용) -->
+	<delete id="delete_file_path">
+		DELETE FROM notice_attachments WHERE file_path IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 새로운 첨부파일 삽입 -->
+	<insert	id="modify_insert_attachment" parameterType="List">
+		INSERT INTO notice_attachments (nidx,file_name,file_path,upload_time)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.nidx},#{item.file_name},#{item.file_path},now())
+		</foreach>
+	</insert>
+	
 	<!-- 조회수 증가 -->
 	<update id="notice_count_view">
-		update notice set view_count = view_count + 1 where nidx=#{nidx}
+		update notice set view_count = view_count + 1 where nidx=#{nidx} 
 	</update>
 	
 	<!-- 쇼핑몰 회원 리스트 출력 -->

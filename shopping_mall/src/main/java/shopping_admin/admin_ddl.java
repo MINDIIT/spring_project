@@ -2,6 +2,8 @@ package shopping_admin;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONObject;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +42,7 @@ public class admin_ddl extends md5_pass{
 		int result=tm2.selectOne("shopping.product_count",data);
 		return result;
 	}
+	
 	//상품 삭제
 	public int product_delete(String pidx,HttpServletRequest req) {
 		String[] pidxdata = pidx.split(",");
@@ -53,6 +58,7 @@ public class admin_ddl extends md5_pass{
 		int result = tm2.delete("shopping.product_delete",pidx_data);
 		return result;
 	}
+	
 	//공지사항 삭제
 	public int notice_delete(String nidx,HttpServletRequest req) {
 		String callback = "";
@@ -79,6 +85,106 @@ public class admin_ddl extends md5_pass{
 			}
 		}
 	}
+	//공지사항 게시글 등록
+	public String  notice_insert(notice_dao dao, List<MultipartFile> files,HttpServletRequest req) {
+		String callback = "";
+		int result = tm2.insert("shopping.notice_insert",dao);
+		notice_attachments_dao attch_dao = new notice_attachments_dao();
+		int result2 = 0;
+			for(MultipartFile file :files) {
+				if(!file.isEmpty()) {
+					String url = req.getServletContext().getRealPath("/upload/");
+					String filename = file.getOriginalFilename();
+					String filepath = url+filename;
+					File f = new File(filepath);
+					try {
+						file.transferTo(f);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					attch_dao.setNidx(dao.getNidx());
+					attch_dao.setFile_name(filename);
+					attch_dao.setFile_path(filepath);
+					result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
+					}else {
+						attch_dao.setNidx(dao.getNidx());
+						attch_dao.setFile_name(null);
+						attch_dao.setFile_path(null);
+						result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
+					}
+				}
+		if(result>0 && result2>0) {
+			callback = "ok";
+		}else {
+			callback = "no";
+		}
+		return callback;
+	}
+	
+	//공지사항 수정페이지 - 수정 버튼
+	public String notice_modify(notice_dao dao,HttpServletRequest req ,List<String> filestodelete, List<MultipartFile> newfiles) {
+		//수정 정보 업데이트
+		System.out.println(dao.getIs_pinned());
+		String result ="";
+		int update_result = tm2.update("shopping.update_notice",dao);
+		int remove_file = 0;
+		int save_file =0;
+		//기존 파일 삭제
+		if(filestodelete!=null&&!filestodelete.isEmpty()) {
+			for(String filePath : filestodelete) {
+				delete_realfile(filePath);
+			}
+			remove_file =tm2.delete("shopping.delete_file_path",filestodelete);
+		}
+		//새로운 파일 저장
+		if(newfiles !=null && !newfiles.isEmpty()) {
+			List<notice_attachments_dao> attaachments = save_newfiles(dao,newfiles, req,dao.getNidx());
+			save_file=tm2.insert("shopping.modify_insert_attachment",attaachments);
+		}
+		if(update_result>0 && remove_file>0 && save_file>0) {
+			result = "ok";
+		}else {
+			result ="no";
+		}
+		return result;
+	}
+	
+	//공지샤항 수정페이지 - 기존 파일 실제 삭제 메소드
+	private void delete_realfile(String filePath) {
+		File file = new File(filePath);
+		if(file.exists()) {
+			file.delete();
+		}
+	}
+	
+	//공지사항 수정페이지 - 새로운 첨부파일 실제 저장 메소드 
+	private List<notice_attachments_dao> save_newfiles(notice_dao dao,List<MultipartFile> files,HttpServletRequest req,int nidx){
+		List<notice_attachments_dao> attachments = new ArrayList<>();
+		notice_attachments_dao attch_dao = new notice_attachments_dao();
+		for(MultipartFile file : files) {
+			if(!file.isEmpty()) {
+				String url = req.getServletContext().getRealPath("/upload/");
+				String filename = file.getOriginalFilename();
+				String filepath = url+filename;
+				File f = new File(filepath);
+				try {
+					file.transferTo(f);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				attch_dao.setNidx(nidx);
+				attch_dao.setFile_name(filename);
+				attch_dao.setFile_path(filepath);
+				attachments.add(attch_dao);
+				}else {
+					attch_dao.setNidx(dao.getNidx());
+					attch_dao.setFile_name(null);
+					attch_dao.setFile_path(null);
+					attachments.add(attch_dao);
+				}		}
+		return attachments;
+	}
+	
 	
 	//상품 등록
 	public int product_insert(products_dao dao, HttpServletRequest req) {
@@ -129,6 +235,7 @@ public class admin_ddl extends md5_pass{
 			}
 		}
 	}
+	
 	//상품 리스트 출력 페이지
 	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
 		List<products_dao> pl = new ArrayList<products_dao>();
@@ -184,6 +291,7 @@ public class admin_ddl extends md5_pass{
 		}
 		return cd;
 	}
+	
 	//카테고리 데이터 갯수
 	public int cate_list_page(String admin_id,String search_part_category,String search_word_category) {
 		Map< String, String> data = new HashMap<String, String>();
@@ -194,40 +302,23 @@ public class admin_ddl extends md5_pass{
 		return result;
 	}
 	
-	//공지사항 게시글 등록
-	public String  notice_insert(notice_dao dao, List<MultipartFile> files,HttpServletRequest req) {
-		String callback = "";
-		int result = tm2.insert("shopping.notice_insert",dao);
-		notice_attachments_dao attch_dao = new notice_attachments_dao();
-		int result2 = 0;
-			for(MultipartFile file :files) {
-				if(!file.isEmpty()) {
-					String url = req.getServletContext().getRealPath("/upload/");
-					String filename = file.getOriginalFilename();
-					String filepath = url+filename;
-					File f = new File(filepath);
-					try {
-						file.transferTo(f);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					attch_dao.setNidx(dao.getNidx());
-					attch_dao.setFile_name(filename);
-					attch_dao.setFile_path(filepath);
-					result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
-					}else {
-						attch_dao.setNidx(dao.getNidx());
-						attch_dao.setFile_name(null);
-						attch_dao.setFile_path(null);
-						result2 = tm2.insert("shopping.notice_insert_attachments",attch_dao);
-					}
-				}
-		if(result>0 && result2>0) {
-			callback = "ok";
-		}else {
-			callback = "no";
-		}
-		return callback;
+
+	//공지사항 게시글 view page 출력
+	public List<notice_dao> notice_view(String admin_id,String nidx){
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("admin_id", admin_id);
+		data.put("nidx", nidx);
+		List<notice_dao> result = tm2.selectList("shopping.notice_view",data);
+		return result;
+	}
+	
+	//공지사항 view page 첨부파일 출력
+	public List<notice_attachments_dao> notice_view_attach(String admin_id,String nidx){
+		Map<String, Object> data = new HashMap<String, Object>(); 
+		data.put("admin_id", admin_id);
+		data.put("nidx", nidx);
+		List<notice_attachments_dao> result = tm2.selectList("shopping.notice_view_attach",data);
+		return result;
 	}
 	
 	//공지사항 게시글 리스트 출력
@@ -246,6 +337,12 @@ public class admin_ddl extends md5_pass{
 		Map< String, Object> data = new HashMap<String, Object>();
 		data.put("admin_id", admin_id);
 		int result = tm2.selectOne("shopping.notice_list_count",data);
+		return result;
+	}
+	
+	//공지사항 게시물 조회수
+	public int notice_view_count(String nidx) {
+		int result = tm2.update("shopping.notice_count_view",nidx);
 		return result;
 	}
 	
@@ -284,11 +381,17 @@ public class admin_ddl extends md5_pass{
 		return result;
 	}
 	
-	//관리자 승인 대기 리스트 출력
+	//관리자 리스트 출력
 	public List<admin_dao> alldata(){
 		List<admin_dao> all = new ArrayList<admin_dao>();
 		all = tm2.selectList("shopping.standby_list");
 		return all;
+	}
+	
+	//관리자 리스트 수 출력
+	public int admin_count() {
+		int result = tm2.selectOne("shopping.admin_list_count");
+		return result;
 	}
 	
 	//상품코드 중복 체크

@@ -1,6 +1,7 @@
 <%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>    
  <%
 	Date today = new Date();
 %>    
@@ -19,6 +20,13 @@
     <link rel="icon" href="./img/logo.png" sizes="64x64">
     <link rel="icon" href="./img/logo.png" sizes="32x32">
     <link rel="icon" href="./img/logo.png" sizes="16x16">
+        <script>
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </head>
 <script src="./js/jquery.js?v=1"></script>
 <script src="./js/notice.js?v=<%=today%>"></script>

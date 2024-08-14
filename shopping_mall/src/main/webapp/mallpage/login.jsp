@@ -1,5 +1,9 @@
+<%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+ <%
+	Date today = new Date();
+%>     
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -7,8 +11,9 @@
     <meta charset="utf-8" />
     <link href="../mallpage/css/index.css" rel="stylesheet" />
     <link href="../mallpage/css/subpage.css" rel="stylesheet" />
+    <script src="./js/jquery.js?v=1"></script>
+	<script src="./js/mall.js?v=<%=today%>"></script>
   </head>
-
   <body>
 <%@ include file="/mallpage/mall_header.jsp" %>
  <main>
@@ -42,7 +47,7 @@
           </div>
           </form>
           <ul class="btns_login">
-          <li><input type="button" value="회원가입" class="a"></li>
+          <li><input type="button" value="회원가입" class="a" id="to_agreepage"></li>
           <li><input type="button" value="아이디 찾기" class="a"></li>
           <li><input type="button" value="비밀번호 찾기" class="a1"></li>
           </ul>

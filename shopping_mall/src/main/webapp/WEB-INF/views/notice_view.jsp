@@ -1,5 +1,10 @@
+<%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>    
+     <%
+	Date today = new Date();
+%>    
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -16,25 +21,10 @@
     <link rel="icon" href="./img/logo.png" sizes="32x32">
     <link rel="icon" href="./img/logo.png" sizes="16x16">
 </head>
+<script src="./js/jquery.js?v=1"></script>
+<script src="./js/notice.js?v=<%=today%>"></script>
 <body>
-<header class="headercss">
-    <div class="header_div">
-        <p><img src="./img/logo.png" class="logo_sm"> ADMINISTRATOR</p>
-        <p>홍길동 관리자 <a href="#">[개인정보 수정]</a> <a href="#">[로그아웃]</a></p>
-    </div>
-</header>
-<nav class="navcss">
-    <div class="nav_div">
-        <ol>
-            <li title="쇼핑몰 상품관리">쇼핑몰 관리자 리스트</li>
-            <li title="쇼핑몰 회원관리">쇼핑몰 회원관리</li>
-            <li title="쇼핑몰 상품관리">쇼핑몰 상품관리</li>
-            <li title="쇼핑몰 기본설정">쇼핑몰 기본설정</li>
-            <li title="쇼핑몰 공지사항">쇼핑몰 공지사항</li>
-        </ol>
-    </div>
-
-</nav>
+<%@ include file="/admin/header.jsp" %>
 <main class="maincss">
 <section>
     <p>공지사항 확인 페이지</p>
@@ -42,39 +32,45 @@
 <ul>
     <li>공지사항 제목</li>
     <li>
-       
+    	${data[0].notice_title}
     </li>
 </ul>
 <ul>
     <li>글쓴이</li>
     <li>
-     
+     	${data[0].admin_name}
     </li>
 </ul>
 <ul>
     <li>첨부파일</li>
-    <li>
-       
-    </li>
+	<li>
+		<a href="#" class="download-link"   data-filepath="${data2[0].file_path}">
+		     ${data2[0].file_name}
+		</a>       
+	</li>
 </ul>
 <ul class="ul_height">
     <li>공지내용</li>
     <li>
-        <div class="notice_input3" style="overflow-y: auto;"></div>
+        <div class="notice_input3" style="overflow-y: auto;">
+        		<cr:out value="${data[0].notice_content}" escapeXml="false"/>
+        </div>
     </li>
 </ul>
 </div>
 <div class="board_btn">
-    <button class="border_del">공지목록</button>
-    <button class="border_add">공지수정</button>
-    <button class="border_modify" style="margin-left: 8px;">공지삭제</button>
+    <button class="border_del" id="notice_list_back_viewpage">공지목록</button>
+    <button class="border_add" id="notice_modify_btn" value="${data[0].nidx}">공지수정</button>
+    <button class="border_modify" style="margin-left: 8px;" id="notice_delete_viewpage" value="${data[0].nidx}">공지삭제</button>
 </div>
 </section>
-</main>
-<footer class="main_copyright">
-    <div>
-        Copyright ⓒ 2024 shopbag All rights reserved.
+<div id="filePopup" style="display:none; position:fixed; top:10%; left:10%; width:80%; height:80%; background:white; border:1px solid black; z-index:10000; overflow:auto;">
+    <div style="text-align:right;">
+        <button onclick="closePopup()">Close</button>
     </div>
-</footer>
+    <iframe id="fileContent" style="width:100%; height:90%; border:none;"></iframe>
+</div>
+</main>
+<%@ include file="/admin/footer.jsp" %>
 </body>
 </html>
