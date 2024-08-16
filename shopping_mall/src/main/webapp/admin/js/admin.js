@@ -369,6 +369,90 @@ var $id_doubleck=0;
 			location.href="./index.jsp";
 		}
 	});
+	
+	//일반 회원 계정 상태 핸들링
+	//1.계정 비활성화
+	$('.new_addbtn1').click(function(){
+		var midx = $(this).data("midx");
+		if(confirm('계정을 비활성화 하시겠습니까?')){
+			$.ajax({
+				url : "./member_active.do",
+				type : "post",
+				contentType : "application/x-www-form-urlencoded",
+				data : {
+					account_suspended : "Y",
+					midx : midx
+				},success: function(result){
+					if(result=="success"){
+						alert('계정이 비활성화 되었습니다.');
+						location.reload();						
+					}
+				},error:function(){
+					alert('계쩡 비활성화에 실패했습니다.')
+				}
+			});
+		}	
+	});
+	//2.계정 활성화
+	$('new_addbtn2').click(function(){
+		var midx = $(this).data("midx"); 
+		if(confirm('계정을 활성화 하시겠습니까?')){
+			$.ajax({
+				url : "./member_active.do",
+				type : "post",
+				data : {
+					account_suspended : "N",
+					midx : midx
+				},contentType : "application/x-www-form-urlencoded",
+				success: function(result){
+					if(result=="success"){
+						alert('계정이 활성화 되었습니다.');
+						location.reload();						
+					}
+				},error:function(){
+					alert('계쩡 비활성화에 실패했습니다.')
+				}
+			});
+		}		
+	});
+	
+	//이용 약관 수정 버튼
+	$('#btnUpdateTerms').click(function(){
+		var updateTerms = $('#temsTextArea').val();
+		$.ajax({
+			url : "./update_terms.do",
+			type : "post",
+			data : {term_content : updateTerms,
+					term_type : "terms_of_service"
+			},
+			contentType : "application/x-www-form-urlencoded",
+			success : function(response){
+				$('#temsTextArea').val(response);
+				alert('약관이 성공적으로 업데이트 되었습니다.');
+			},error : function(){
+				alert("약관 업데이트 중 오류가 발생했습니다.");
+			}
+		});
+	});
+	
+	//개인정보 수집 및 이용 약관 수정 버튼
+	$('#btnUpdatePrivacyPolicy').click(function(){
+		var updatePrivacyPolicy = $('#privacypolicyTextArea').val();
+		$.ajax({
+			url : "./update_terms.do",
+			type : "post",
+			data : {term_content : updatePrivacyPolicy,
+					term_type : "privacypolicy"
+			},
+			contentType : "application/x-www-form-urlencoded",
+			success : function(response){
+				$('#temsTextArea').val(response);
+				alert('약관이 성공적으로 업데이트 되었습니다.');
+			},error : function(){
+				alert("약관 업데이트 중 오류가 발생했습니다.");
+			}
+		});		
+	});
 });
 //관리자 등록 승인여부 등록
 function agree(aidx){
@@ -381,3 +465,14 @@ function disagree(aidx){
 		location.href="./admin_userok.do?agree=Y,"+aidx;
 	}
 }
+////일반 회원 계정 상태 핸들링
+//function account_suspend(midx){
+//	if(confirm('계정을 비활성화 하시겠습니까?')){
+//		location.href="./member_active.do?account_suspended=Y,"+midx;
+//	}
+//}
+//function account_activate(midx){
+//	if(confirm('계정을 활성화 하시겠습니까?')){
+//		location.href="./member_active.do?account_suspended=N,"+midx;
+//	}	
+//}

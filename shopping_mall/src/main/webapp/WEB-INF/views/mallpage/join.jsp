@@ -9,10 +9,10 @@
   <head>
     <title>Shop Bag</title>
     <meta charset="utf-8" />
-    <link href="../mallpage/css/index.css" rel="stylesheet" />
-    <link href="../mallpage/css/subpage.css" rel="stylesheet" />
-    <link href="../mallpage/css/agree.css?v=1" rel="stylesheet" />
-    <link href="../mallpage/css/join.css?v=1" rel="stylesheet" />
+    <link href="./mallpage/css/index.css" rel="stylesheet" />
+    <link href="./mallpage/css/subpage.css" rel="stylesheet" />
+    <link href="./mallpage/css/agree.css?v=1" rel="stylesheet" />
+    <link href="./mallpage/css/join.css?v=1" rel="stylesheet" />
     <script src="./js/jquery.js?v=1"></script>
 	<script src="./js/join.js?v=<%=today%>"></script>
   </head>

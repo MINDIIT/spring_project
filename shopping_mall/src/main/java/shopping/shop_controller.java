@@ -3,14 +3,12 @@ package shopping;
 import java.io.PrintWriter;
 
 import javax.annotation.Resource;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -21,24 +19,26 @@ public class shop_controller {
 	@Resource(name="mall")
 	private shopping_ddl sd;
 	
+	
 	@GetMapping("/mallpage/login.do")
-	public String user_login() {
+	public String user_login(@PathVariable("admin_id") String adminId, Model model) {
 		
-		return "/login";
+		model.addAttribute("admin_id",adminId);
+		return "/mallpage/login";
 	}
 	
 	//약관 동의 페이지
 	@GetMapping("/mallpage/agree.do")
 	public String agree_page() {
 		
-		return "/agree";
+		return "/mallpage/agree";
 	}
 	
 	//회원가입 페이지 출력
 	@GetMapping("/mallpage/join.do")
 	public String user_join() {
 		
-		return "/join";
+		return "/mallpage/join";
 	}
 	
 	

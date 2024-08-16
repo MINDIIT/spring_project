@@ -22,26 +22,62 @@
 		SELECT COUNT(*) AS ctn FROM admin_user
 	</select>
 	
+	<!-- 일반 회원 계정 승인 여부 핸들링 -->
+	<update id="member_account" parameterType="Map">
+		UPDATE member SET account_suspended = #{account_suspended} WHERE midx = #{midx}
+	</update>
+	
+	<!-- 이용 약관 출력 -->
+	<select id="get_terms" parameterType="Map" resultType="termsdao">
+		SELECT * FROM terms
+	</select>
+	
+	<!-- 약관 수정 -->
+	<insert id="terms_modify" parameterType="Map">
+		INSERT INTO terms (tidx,term_type, term_content,create_at,updated_at) VALUES ('0',#{term_type}, #{term_content},now(),now()) 
+		ON DUPLICATE KEY UPDATE
+		term_content = #{term_content};
+	</insert>
+	
 	<!-- 관리자 추가 승인대기 -->
 	<insert id="admin_standbyadd" parameterType="admindao">
 		insert into admin_user (aidx,admin_id,admin_pass,admin_name,admin_email,admin_hp,admin_team,admin_position,admin_confirm,admin_join)
 		values('0',#{admin_id},#{admin_pass},#{admin_name},#{admin_email},#{admin_hp},#{admin_team},#{admin_position},'N',now());
 	</insert>
+	
 	<!-- 웹사이트 설정 테이블 삽입 -->
 	<insert id="insert_websiteinfo" parameterType="Map" useGeneratedKeys="true" keyProperty="sidx">
 		insert into website_settings(admin_id,website_title,administrator_email_address,point_use,registration_bonus_points,permission_level,add_time)
 		values (#{admin_id},#{website_title},#{administrator_email_address},#{point_use},#{registration_bonus_points},#{permission_level},now());
 	</insert>
+	
+	<!-- 웹사이트 설정 정보 출력 -->
+	<select id="get_websiteinfo" resultType="websitesettingsdao">
+		SELECT * FROM website_settings ORDER BY add_time DESC LIMIT 1
+	</select>
+	
 	<!-- 회사 정보 테이블 삽입 -->
 	<insert id="insert_companyinfo" parameterType="Map">
 		insert into company_info(sidx,company_name,business_registration_number,ceo_name,company_phone_number,online_business_registration_number,value_added_service_provider_number,business_location_postal_code,business_location_address,data_protection_officer_name,data_protection_officer_email)
 		values (#{sidx},#{company_name},#{business_registration_number},#{ceo_name},#{company_phone_number},#{online_business_registration_number},#{value_added_service_provider_number},#{business_location_postal_code},#{business_location_address},#{data_protection_officer_name},#{data_protection_officer_email});
 	</insert>
+	
+	<!-- 회사 정보 출력 -->
+	<select id="get_companyinfo" resultType="companyinfo">
+		SELECT * FROM company_info ORDER BY sidx DESC LIMIT 1
+	</select>
+	
 	<!-- 결제 및 배송 설정 테이블 삽입 -->
 	<insert id="insert_payment_delivery_settings" parameterType="Map">
 		insert into payment_delivery_settings(sidx,bank_transfer_bank_name,bank_transfer_account_number,credit_card_payment,mobile_payment,book_voucher_payment,min_payment_point,max_payment_point,cash_receipt_usage,delivery_company_name,delivery_fee,preferred_delivery_date_usage)
 		value (#{sidx},#{bank_transfer_bank_name},#{bank_transfer_account_number},#{credit_card_payment},#{mobile_payment},#{book_voucher_payment},#{min_payment_point},#{max_payment_point},#{cash_receipt_usage},#{delivery_company_name},#{delivery_fee},#{preferred_delivery_date_usage})
 	</insert>
+	
+	<!-- 결제 및 배송 정보 출력 -->
+	<select id="get_payment_deliveryinfo" resultType="paymentdao">
+		SELECT * FROM payment_delivery_settings ORDER BY sidx DESC LIMIT 1
+	</select>	
+	
 	<!-- 카테고리 등록 -->
 	<insert id="insert_cate" parameterType="catecodedao">
 		insert into classification_code(cidx,admin_id,classification_code,main_menu_code,main_menu_name,menu_usage,code_add)
@@ -304,15 +340,13 @@
 		update notice set view_count = view_count + 1 where nidx=#{nidx} 
 	</update>
 	
-	<!-- 쇼핑몰 회원 리스트 출력 -->
-	<select id="select_shop_member">
-		SELECT * FROM member
-		<where>
-			<if test="">
-			
-			</if>
-		</where>
-	
+	<!-- 쇼핑몰 회원 리스트 페이지 - 리스트 출력 -->
+	<select id="memberlist" parameterType="Map" resultType="memberdao">
+		SELECT * FROM member ORDER BY midx DESC limit #{startpg},#{pageno}
 	</select>
 	
+	<!-- 쇼핑몰 회원 리스트 페이지 - 총 회원 수  -->
+	<select id="member_list_count" resultType="int">
+		SELECT COUNT(*) AS ctn FROM member 
+	</select>
 </mapper>
