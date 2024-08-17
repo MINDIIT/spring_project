@@ -1,24 +1,35 @@
 package shopping_admin;
 
+import java.io.File;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.mysql.cj.Session;
 
 @Controller
 public class admin_controller {
@@ -27,6 +38,27 @@ public class admin_controller {
 	@Resource(name="admin")
 	private admin_ddl ad;
 
+	//공지사항 view page 첨부파일 다운로드
+	@GetMapping("/admin/filedownload.do")
+	public ResponseEntity<FileSystemResource> notice_viewpage_file_download(@RequestParam("filePath") String filePath) {
+	    try {
+	        // Decode the file path if necessary
+	        filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString());
+	    } catch (UnsupportedEncodingException e) {
+	        return ResponseEntity.badRequest().build();
+	    }
+		
+		FileSystemResource resource = new FileSystemResource(filePath);
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+		
+		return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
+	}
 	
 	//일반회원 리스트 페이지
 	@GetMapping("/admin/shop_member_list.do")
@@ -41,14 +73,50 @@ public class admin_controller {
 		return "notice_write";
 	}
 	
+	//공지사항 view 페이지
+	@GetMapping("/admin/notice_view.do")
+	public String notice_viewpage(String nidx,HttpSession hs,HttpServletRequest req,Model m) {
+		//HttpSession hs =req.getSession();
+		List<notice_dao> data = ad.notice_view((String)hs.getAttribute("admin_id"), nidx);
+		List<notice_attachments_dao> data2 = ad.notice_view_attach((String)hs.getAttribute("admin_id"), nidx);
+		m.addAttribute("data",data);
+		m.addAttribute("data2",data2);
+		
+		@SuppressWarnings("unchecked")
+		List<Object> viewedNotices = (List<Object>) hs.getAttribute("view_notice");
+		
+		if(viewedNotices==null) {
+			viewedNotices = new ArrayList<>();
+			hs.setAttribute("view_notice", viewedNotices);
+		}
+		if(!viewedNotices.contains(nidx)) {
+			ad.notice_view_count(nidx);
+			//세션에 현재 게시물 id 추가
+			viewedNotices.add(nidx);
+		}
+		
+		return "notice_view";
+	}
+	
+	//공지사항 게시글 수정페이지 출력
+	@GetMapping("/admin/notice_modify.do")
+	public String notice_modify(@RequestParam(value="",required = false)String nidx,HttpServletRequest req,Model m)throws Exception {
+			HttpSession hs =req.getSession();
+			List<notice_dao> data = ad.notice_view((String)hs.getAttribute("admin_id"), nidx);
+			List<notice_attachments_dao> data2 = ad.notice_view_attach((String)hs.getAttribute("admin_id"), nidx);
+			m.addAttribute("data",data);
+			m.addAttribute("data2",data2);
+
+		return "/notice_modify";
+	}
+	
 	//공지사항 게시물 등록
 	@PostMapping("/admin/notice_insertok.do")
-	public String notice_insertok(@ModelAttribute notice_dao dao,@RequestParam("nfile") List<MultipartFile> files,HttpServletResponse res)throws Exception {
+	public String notice_insertok(@ModelAttribute notice_dao dao,@RequestParam("nfile") List<MultipartFile> files,HttpServletResponse res,HttpServletRequest req)throws Exception {
 		res.setContentType("text/html;charset=utf-8");	
 		this.pw = res.getWriter();
 		String result = "";
-		System.out.println(dao.getIs_pinned());
-		result = ad.notice_insert(dao, files);
+		result = ad.notice_insert(dao, files,req);
 		try {
 			if(result.equals("ok")) {
 				this.pw.print("<script>"
@@ -58,12 +126,37 @@ public class admin_controller {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("여기에러??!!");
 			this.pw.print("<script>"
 					+ "alert('오류로 인해 요청하신 작업을 처리하지 못했습니다.');"
 					+ "history.go(-1);"
 					+ "</script>");
 		}	
+		return null;
+	}
+	
+	//공지사항 수정페이지 게시글 수정 핸들링
+	@PostMapping("/admin/notice_modifyok.do")
+	public String notice_modifyok(@ModelAttribute notice_dao dao,
+			@RequestParam("nfile") List<MultipartFile> files,
+			@RequestParam("filesToDelete") List<String> filestodelete ,HttpServletResponse res,HttpServletRequest req)throws Exception {
+		res.setContentType("text/html;charset=utf-8");
+		this.pw = res.getWriter();
+		String result = "";
+		try {
+			result = ad.notice_modify(dao, req,filestodelete,files);
+			if(result.equals("ok")) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 공지사항이 수정되었습니다.');"
+						+ "location.href='./notice_modify.do';"
+						+ "</script>");				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류가 발생하여 수정하지 못했습니다.');"
+					+ "location.href=history.go(-1);"
+					+ "</script>");	
+		}
 		return null;
 	}
 	
@@ -77,7 +170,6 @@ public class admin_controller {
 	//상품등록 페이지 이동
 	@GetMapping("/admin/product_write.do")
 	public String product_write(Model m,HttpServletRequest req,@RequestParam(defaultValue = "",required = false)String search_part_category,@RequestParam(defaultValue = "",required = false)String search_word_category) {
-		//분류코드 리스트 출력되어야함
 		try {
 			HttpSession hs =req.getSession();
 			List<cate_code_dao> result = ad.cate_all_data((String)hs.getAttribute("admin_id"),search_part_category,search_word_category,null,null,false);
@@ -90,6 +182,7 @@ public class admin_controller {
 		}
 		return "product_write";
 	}
+	
 	//카테고리 리스트 페이지 이동
 	@GetMapping("/admin/cate_list.do")
 	public String cate_list(@RequestParam(value = "",required = false)Integer page,Model m,@RequestParam(defaultValue = "",required = false)String search_part_category,@RequestParam(defaultValue = "",required = false)String search_word_category,HttpServletRequest req) {
@@ -114,6 +207,8 @@ public class admin_controller {
 		}
 		return "cate_list";
 	}
+	
+	
 	//공지사항 리스트 페이지로 이동
 	@GetMapping("/admin/notice_list.do")
 	public String notice_list (@RequestParam(value = "",required = false)Integer page,Model m,HttpServletRequest req) {
@@ -132,7 +227,7 @@ public class admin_controller {
 		m.addAttribute("result",result);
 		m.addAttribute("startpg",startpg);
 		
-		return "notice_list";
+		return "/notice_list";
 	}
 	
 	//상품 리스트 출력 페이지
@@ -179,11 +274,11 @@ public class admin_controller {
 	
 	//상품 삭제
 	@GetMapping("/admin/product_delete.do")
-	public String product_deleteok(String pidx,HttpServletResponse res)throws Exception {
+	public String product_deleteok(String pidx,HttpServletResponse res,HttpServletRequest req)throws Exception {
 		res.setContentType("text/html;charset=utf-8");	
 		this.pw = res.getWriter();
 		try {
-			int result = ad.product_delete(pidx);
+			int result = ad.product_delete(pidx,req);
 			if(result>0) {
 				this.pw.write("<script>"
 						+ "alert('정상적으로 상품이 삭제되었습니다.');"
@@ -196,6 +291,39 @@ public class admin_controller {
 					+ "alert('오류로 인해 요청하신 작업을 수행하지못했습니다.');"
 					+ "location.href='./product_list.do';"
 					+ "</script>");
+		}
+		return null;
+	}
+	
+//	//공지사항 수정페이지 첨부파일 삭제 핸들링
+//	@PostMapping("/admin/notice_attach_delete.do")
+//	public ResponseEntity<String> notice_attach_deleteok(@RequestParam(value="",required = false)String filepath ,HttpServletResponse res) {
+//		res.setContentType("text/html;charset=utf-8");
+//		ResponseEntity<String> result = ad.notice_modify_file_deleteok(filepath);
+//		return result;
+//	}
+	
+	
+	//공지사항 게시글 삭제
+	@GetMapping("/admin/notice_delete.do")
+	public String notice_deleteok(@RequestParam(value="",required = false)String nidx,HttpServletResponse res,HttpServletRequest req)throws Exception{
+		res.setContentType("text/html;charset=utf-8");
+		this.pw = res.getWriter();
+		try {
+			int result = ad.notice_delete(nidx, req);
+			System.out.println(result);
+			if(result>0) {
+				this.pw.write("<script>"
+						+ "alert('게시글이 정상적으로 삭제되었습니다.');"
+						+ "location.href='./notice_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.write("<script>"
+					+ "alert('오류로 인해 요청하신 작업을 수행하지못했습니다.');"
+					+ "location.href='./notice_list.do';"
+					+ "</script>");			
 		}
 		return null;
 	}
@@ -333,15 +461,16 @@ public class admin_controller {
 		return null;
 	}
 	
-	//관리자 등록 승인 대기 리스트 출력
+	//관리자 리스트 출력
 	@GetMapping("/admin/admin_list.do")
 	public String admin_list(Model m,HttpServletResponse res) {
 		try {
 			List<admin_dao> result = ad.alldata();
+			int ctn = ad.admin_count();
 			m.addAttribute("result",result);
+			m.addAttribute("ctn",ctn);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println(e);
 		}
 		return "/admin_list";
 	}

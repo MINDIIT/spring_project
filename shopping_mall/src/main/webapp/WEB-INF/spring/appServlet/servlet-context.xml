@@ -24,7 +24,10 @@
 	<resources location="/upload/" mapping="/upload/**"></resources>
 	<resources location="/product/" mapping="/product/**"/>
 	<resources location="/admin/" mapping="/admin/**"/>
+	<resources location="/mallpage/" mapping="/mallpage/**"/>
+	<resources location="/mall/" mapping="/mall/**"/>
 	<resources location="/shopping_admin/" mapping="/shopping_admin/**"/>
+	<resources location="/shopping/" mapping="/shopping/**"/>
 	<resources location="/pay/" mapping="/pay/**"/>
     <resources location="/upload/" mapping="/upload/**"/>
     

@@ -41,10 +41,11 @@
     </ol>
     </cr:if>
     <cr:if test="${result!=null}">
-    <cr:forEach var="data" items="${result}">
+    <cr:set var="ino" value="${ctn-1}"/>
+    <cr:forEach var="data" items="${result}" step="1" varStatus="idx">
     <cr:if test="${data.admin_name!='최고관리자'}">
     <ol class="new_admin_lists2">
-        <li>${data.aidx}</li>
+        <li>${ino-idx.index}</li>
         <li>${data.admin_name}</li>
         <li>${data.admin_id}</li>
         <li>${data.admin_hp}</li>

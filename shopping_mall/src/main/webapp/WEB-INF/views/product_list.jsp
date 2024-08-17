@@ -63,13 +63,13 @@
         <li>${data.product_code}</li>
         <li>
         <cr:if test="${data.main_product_image1 != null}">
-        	<img src="../${data.main_product_image1}" width="50" height="50">
+        	<img src=".././upload/${data.main_product_image1}" width="100" height="50">
         </cr:if>
         <cr:if test="${data.main_product_image2 != null}">
-        	<img src="../${data.main_product_image2}" width="50" height="50">
+        	<img src=".././upload/${data.main_product_image2}" width="100" height="50">
         </cr:if>
         <cr:if test="${data.main_product_image3 != null}">
-        	<img src="../${data.main_product_image3}" width="50" height="50">
+        	<img src=".././upload/${data.main_product_image3}" width="100" height="50">
         </cr:if>        
         </li>
         <li>${data.product_name}</li>

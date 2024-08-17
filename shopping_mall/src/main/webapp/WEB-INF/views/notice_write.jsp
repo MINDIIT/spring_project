@@ -66,7 +66,7 @@
 </ul>
 </div>
 <div class="board_btn">
-    <button class="border_del">공지목록</button>
+    <button class="border_del" id="notice_list_back_insertpage">공지목록</button>
     <button class="border_add" id="notice_insert_btn">공지등록</button>
 </div>
 </form>

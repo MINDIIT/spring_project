@@ -1,25 +1,23 @@
+<%@page import="java.util.Date"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+ <%
+	Date today = new Date();
+%>      
 <!DOCTYPE html>
 <html lang="ko">
   <head>
     <title>Shop Bag</title>
     <meta charset="utf-8" />
-    <link href="./index.css" rel="stylesheet" />
-    <link href="./subpage.css" rel="stylesheet" />
-    <link href="./agree.css?v=1" rel="stylesheet" />
+    <link href="../mallpage/css/index.css" rel="stylesheet" />
+    <link href="../mallpage/css/subpage.css" rel="stylesheet" />
+    <link href="../mallpage/css/agree.css?v=1" rel="stylesheet" />
+    <script src="./js/jquery.js?v=1"></script>
+	<script src="./js/mall.js?v=<%=today%>"></script>
   </head>
 
   <body>
-    <div class="navbar">
-      <a href="#" id="logo">
-        <img src="images/logo.jpg" width="149">
-        </a>
-        <ul id="menu">
-          <li><a href="#">LOGIN</a></li>
-          <li><a href="#">MEMBER SHIP</a></li>
-          <li><a href="#">CART</a></li>
-          <li><a href="#">CUSTOMER CENTER</a></li>
-        </ul>
-    </div>
+<%@ include file="/mallpage/mall_header.jsp" %>
  <main>
     <div class="products">
       <h3>MEMBER_JOIN</h3>
@@ -72,38 +70,6 @@
       </div>
     </div>
 </main>
-<footer>
-    <div class="footer">
-      <a href="http://facebook.com">
-        <img src="images/facebook.png"height="20">
-      </a>
-      <a href="http://instagram.com">
-        <img src="images/instagram.png"height="20">
-      </a>
-      <a href="http://twitter.com">
-        <img src="images/twitter.png"height="20">
-      </a>
-    </div>
-    <section class="foot_section"></section>
-    <aside class="aside_footer">
-        <div class="div_footer">
-        <ul>
-        <li><img src="./images/foot_logo.png"></li>
-        <li>
-회사명 :  
-대표자 : 
-주소 :   <br>
-고객센터 : 
-상담시간 : 
-E-Mail : 
-사업자등록번호 :  <br>
-통신판매업신고번호 : 
-개인정보보호책임자 :    <br>
-Copyright © 도메인명 All Rights Reserved.
-        </li>
-        </ul>    
-        </div>
-    </aside>
-</footer>
+<%@ include file="/mallpage/mall_footer.jsp" %>
   </body>
 </html>

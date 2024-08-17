@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     <%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>    
  <%
 	Date today = new Date();
 %>    
@@ -20,6 +21,13 @@
     <link rel="icon" href="./img/logo.png" sizes="64x64">
     <link rel="icon" href="./img/logo.png" sizes="32x32">
     <link rel="icon" href="./img/logo.png" sizes="16x16">
+        <script>
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </head>
 <script src="./js/jquery.js?v=1"></script>
 <script src="./js/notice.js?v=<%=today%>"></script>
@@ -30,7 +38,7 @@
     <p>공지사항 관리페이지</p>
     <div class="subpage_view">
     <ul>
-        <li><input type="checkbox"></li>
+        <li><input type="checkbox" id="notice_all_ck"></li>
         <li>NO</li>
         <li>제목</li>
         <li>글쓴이</li>
@@ -38,14 +46,18 @@
         <li>조회</li>
     </ul>
     <cr:if test="${result!=null}">
-    <cr:set var="ino" value="${ctn}"/>
-    <cr:forEach var="data" items="${result}" varStatus="idx">
+    <cr:set var="ino" value="${ctn-startpg}"/>
+    <cr:forEach var="data" items="${result}" step="1" varStatus="idx">
     <ol>
         <li><input type="checkbox"name="product_ck" value="${data.nidx}"></li>
         <li>${ino-idx.index}</li>
-        <li>${data.notice_title}</li>
+        <li>
+        	<a href="notice_view.do?nidx=${data.nidx}">
+        		${data.notice_title}
+        	</a>
+        </li>
         <li>${data.admin_name}</li>
-        <li>${data.notice_update}</li>
+        <li>${data.notice_update.substring(0, 10)}</li>
         <li>${data.view_count}</li>
     </ol>
     </cr:forEach>
