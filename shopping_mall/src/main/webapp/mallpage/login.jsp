@@ -19,6 +19,7 @@
  <main>
     <div class="products">
       <h3>MEMBER_LOGIN</h3>
+      <h5>${admin_id}의 사이트</h5>
       <div class="sub_view">
         
 

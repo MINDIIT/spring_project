@@ -329,6 +329,34 @@ public class admin_ddl extends md5_pass{
 		return result;
 	}
 	
+	//일반 회원 리스트 페이지 - 회원 리스트 출력
+	public List<member_dao> member_list(Integer startpg, Integer pageno) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("startpg", startpg);
+		data.put("pageno", pageno);
+		List<member_dao> result = tm2.selectList("shopping.memberlist",data);
+		
+		return result;
+	}
+	
+	//일반 회원 리스트 페이지 - 총 회원 수 출력
+	public int member_list_count() {
+		int ctn = tm2.selectOne("shopping.member_list_count");
+		return ctn;
+	}
+	
+	//일반 회원 리스트 페이지 - 약관 출력
+	public List<terms_dao> update_terms(String term_type, String term_content ) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("term_type", term_type);
+		data.put("term_content", term_content);
+		List<terms_dao> result = tm2.selectList("shopping.get_terms",data);
+		return result; 
+	}
+	
+	//일반 회원 리스트 페이지 - 약관 수정
+	
+	
 	//공지사항 게시글 리스트 출력
 	public List<notice_dao> notice_list(String admin_id,Integer startpg, Integer pageno){
 		
@@ -348,7 +376,7 @@ public class admin_ddl extends md5_pass{
 		return result;
 	}
 	
-	//홈페이지 기본설정 등록
+	//홈페이지 기본설정 페이지 - 기본설정 등록
 	public int settings(Map<String, String> data) {
 		int result1 = tm2.insert("shopping.insert_websiteinfo",data);
 		  Object sidxObj = data.get("sidx");
@@ -366,6 +394,32 @@ public class admin_ddl extends md5_pass{
 	    int result2 = tm2.insert("shopping.insert_companyinfo",data);
 		int result3 = tm2.insert("shopping.insert_payment_delivery_settings",data);
 		int result = result1+result2+result3;
+		return result;
+	}
+	
+	//홈페이지 기본설정 페이지 - 페이지 출력
+	public List<website_settings_dao> website_setting_data (){
+		List<website_settings_dao> data = tm2.selectList("shopping.get_websiteinfo");
+		return data;
+	}
+	
+	public List<company_info_dao> company_info_data(){
+		List<company_info_dao> data = tm2.selectList("shopping.get_companyinfo");
+		return data;
+	}
+	
+	public List<payment_delivery_settings_dao> payment_delivery_info(){
+		List<payment_delivery_settings_dao> data = tm2.selectList("shopping.get_payment_deliveryinfo");
+		return data;
+	}
+	
+	
+	//일반 회원 계정 활성화/비활성화 핸들링
+	public int member_account(String account_suspended,String midx) {
+		Map<String, Object> data = new HashMap<String, Object>(); 
+		data.put("account_suspended", account_suspended);
+		data.put("midx",midx);
+		int result = tm2.update("shopping.member_account",data);
 		return result;
 	}
 	

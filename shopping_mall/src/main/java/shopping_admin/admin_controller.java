@@ -60,11 +60,6 @@ public class admin_controller {
                 .body(resource);
 	}
 	
-	//일반회원 리스트 페이지
-	@GetMapping("/admin/shop_member_list.do")
-	public String shop_member_list() {
-		return "shop_member_list";
-	}
 	
 	//공지사항 등록 페이지 이동
 	@GetMapping("/admin/notice_write.do")
@@ -230,6 +225,26 @@ public class admin_controller {
 		return "/notice_list";
 	}
 	
+	//일반회원 리스트 페이지
+	@GetMapping("/admin/shop_member_list.do")
+	public String shop_member_list(Model m,@RequestParam(value = "",required = false)Integer page) {
+		
+		int pageno = 15;
+		int startpg = 0;
+		if(page == null || page == 1) {
+			startpg = 0;
+		}else {
+			startpg = (page - 1)* pageno;
+		}
+		List<member_dao> result = ad.member_list(startpg, pageno);
+		int ctn = ad.member_list_count();
+		m.addAttribute("result",result);
+		m.addAttribute("ctn",ctn);
+		m.addAttribute("startpg",startpg);
+		
+		return "/admin_page/shop_member_list";
+	}
+	
 	//상품 리스트 출력 페이지
 	@GetMapping("/admin/product_list.do")
 	public String product_list(@RequestParam(value = "",required = false)Integer page ,Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
@@ -263,12 +278,16 @@ public class admin_controller {
 		return "/add_master";
 	}
 	
-	//웹 사이트 기본설정 페이지 이동
+	//웹 사이트 기본설정 페이지 
 	@GetMapping("/admin/admin_siteinfo.do")
 	public String admin_siteinfo(HttpServletRequest req,Model m) {
-		HttpSession hs =req.getSession();
-		String admin_id = (String)hs.getAttribute("admin_id");
-		m.addAttribute("admin_id",admin_id);
+		List<website_settings_dao> sitedata = ad.website_setting_data();
+		List<company_info_dao> companydata = ad.company_info_data();
+		List<payment_delivery_settings_dao> pddata = ad.payment_delivery_info();
+		
+		m.addAttribute("sitedata",sitedata);
+		m.addAttribute("companydata", companydata);
+		m.addAttribute("pddata",pddata);
 		return "/admin_siteinfo";
 	}
 	
@@ -294,15 +313,6 @@ public class admin_controller {
 		}
 		return null;
 	}
-	
-//	//공지사항 수정페이지 첨부파일 삭제 핸들링
-//	@PostMapping("/admin/notice_attach_delete.do")
-//	public ResponseEntity<String> notice_attach_deleteok(@RequestParam(value="",required = false)String filepath ,HttpServletResponse res) {
-//		res.setContentType("text/html;charset=utf-8");
-//		ResponseEntity<String> result = ad.notice_modify_file_deleteok(filepath);
-//		return result;
-//	}
-	
 	
 	//공지사항 게시글 삭제
 	@GetMapping("/admin/notice_delete.do")
@@ -412,6 +422,7 @@ public class admin_controller {
 		return null;
 	}
 	
+	
 	//쇼핑몰 기본설정 등록
 	@PostMapping("/admin/settingsok.do")
 	public String settingsok(@RequestParam(required = false) Map<String, String> formData,HttpServletResponse res) throws Exception{
@@ -431,6 +442,27 @@ public class admin_controller {
 					+ "</script>");
 		}finally {
 			this.pw.close();
+		}
+		return null;
+	}
+	
+	//이용약관 수정 핸들링
+	@PostMapping("/admin/update_terms.do")
+	public String update_terms(String term_type, String term_content) {
+		
+		
+		return null;
+	}
+	
+	//일반 회원 계정 정지/해제 핸들링
+	@PostMapping("/admin/member_active.do")
+	public String member_active(String account_suspended,String midx,HttpServletResponse res)throws Exception {
+		this.pw = res.getWriter();
+		int callback = ad.member_account(account_suspended, midx);
+		if(callback>0) {
+			this.pw.print("success");
+		}else {
+			this.pw.print("fail");
 		}
 		return null;
 	}
@@ -550,7 +582,7 @@ public class admin_controller {
 		return null;
 	}
 	
-	//관리자 등록 controller
+	//관리자 등록 
 	@PostMapping("/admin/admin_add.do")
 	public String admin_add(@ModelAttribute("admin")admin_dao dao,HttpServletResponse res) throws Exception {
 		res.setContentType("text/html;charset=utf-8");

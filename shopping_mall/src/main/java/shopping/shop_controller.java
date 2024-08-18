@@ -3,20 +3,18 @@ package shopping;
 import java.io.PrintWriter;
 
 import javax.annotation.Resource;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/mallpage/{admin_id}")
 public class shop_controller {
 	
 	PrintWriter pw = null;
@@ -24,34 +22,35 @@ public class shop_controller {
 	@Resource(name="mall")
 	private shopping_ddl sd;
 	
-	@GetMapping("/login.do")
-	public String user_login() {
-		
-		return "/login";
-	}
+
 	
 	//약관 동의 페이지
-	@GetMapping("/agree.do")
-	public String agree_page(@PathVariable("admin_id")String admin_id) {
+	@GetMapping("/mallpage/agree.do")
+	public String agree_page() {
 		
-		return "/agree";
+		return "./mallpage/agree";
 	}
 	
 	//회원가입 페이지 출력
-	@GetMapping("/join.do")
+	@GetMapping("/mallpage/join.do")
 	public String user_join() {
 		
-		return "/join";
+		return "./mallpage/join";
 	}
 	
+	private String verify_code;
 	
-	//회원가입 페이지 - 메일 인증
-	@PostMapping("/email_verification.do")
-	public String email_verify(String memail,String number,HttpServletResponse res)throws Exception {
+	//회원가입 페이지 - 인증 메일 발송
+	@PostMapping("/mallpage/email_verification.do")
+	public String email_verify(String memail,String number,HttpServletResponse res,HttpServletRequest req)throws Exception {
 		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();
 		try {
+			this.verify_code = number;
 			String result = sd.email_verify(memail, number);
+			HttpSession hs = req.getSession();
+			hs.setAttribute("verificationCode", number);
+			hs.setAttribute("codeEcpiryTime", System.currentTimeMillis()+(3*60*1000));
 			this.pw.print(result);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -61,10 +60,21 @@ public class shop_controller {
 		return null;
 	}
 	
+	//회원 가입 페이지 - 메일 인증 확인
+	@PostMapping("/mallpage/verifyCode_ok.do")
+	public String verify_code_ok(String code,HttpServletResponse res)throws Exception {
+		this.pw = res.getWriter();
+		if(code.equals(verify_code)) {
+			this.pw.print("success");
+		}else {
+			this.pw.print("fail");
+		}
+		return null;
+	}
 	
 	
 	//회원가입 페이지 - 중복확인
-	@PostMapping("/duplicate_idcheck.do")
+	@PostMapping("/mallpage/duplicate_idcheck.do")
 	public String duplicate_idcheck(String mid,HttpServletResponse res)throws Exception {
 		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();

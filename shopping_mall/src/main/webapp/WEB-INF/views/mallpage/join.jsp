@@ -13,8 +13,17 @@
     <link href="../mallpage/css/subpage.css" rel="stylesheet" />
     <link href="../mallpage/css/agree.css?v=1" rel="stylesheet" />
     <link href="../mallpage/css/join.css?v=1" rel="stylesheet" />
-    <script src="./js/jquery.js?v=1"></script>
-	<script src="./js/join.js?v=<%=today%>"></script>
+    <script src="../mallpage/js/jquery.js?v=1"></script>
+	<script src="../mallpage/js/join.js?v=<%=today%>"></script>
+	<style>
+		#resendBtn{
+			display : none;
+		}
+		#timer {
+		    margin-top: 10px; /* 간격 설정 */
+		    color: red; /* 텍스트 색상 설정 */
+		}		
+	</style>
   </head>
 
   <body>
@@ -25,7 +34,7 @@
     <div class="sub_view">
    
     <div class="joinview">     
-    <form>
+    <form id="frm_member_join" method="post" action="./member_joinok.do">
     <h3>회원가입</h3>
 	<span class="join_info">
     <ol>
@@ -52,11 +61,11 @@
     </li>
     <li>※ 이메일</li>
     <li>
-    <input type="text" class="join_in1" id="memail" name="memail"> <input type="button" value="이메일 인증" id="email_verification" class="join_btn1"> ※ 입력하신 이메일을 확인해 주세요.
+    <input type="text" class="join_in1" id="memail" name="memail"> <input type="button" value="인증 메일 발송" id="email_verification" class="join_btn1"><input type="button" value="인증 메일 재발송" id="resendBtn" class="join_btn1"> ※ 입력하신 이메일을 확인해 주세요. <strong id="timer"></strong>
     </li>
     <li>※ 인증번호</li>
     <li>
-    <input type="text" class="join_in1 join_in3" id="verification_code" maxlength="8"> ※ 8자리 인증번호를 입력하세요.
+    <input type="text" class="join_in1 join_in3" id="verification_code" maxlength="8"> <input type="button" value="이메일 인증확인" id="email_verifyck" class="join_btn1"> ※ 8자리 인증번호를 입력하세요. <strong id="verification_result"></strong>
     </li>
     <li>※ 전화번호</li>
     <li>
