@@ -20,8 +20,8 @@
 			display : none;
 		}
 		#timer {
-		    margin-top: 10px; /* 간격 설정 */
-		    color: red; /* 텍스트 색상 설정 */
+		    margin-top: 10px; 
+		    color: red;
 		}		
 	</style>
   </head>
@@ -57,7 +57,7 @@
     </li>
     <li>※ 이름</li>
     <li>
-    <input type="password" class="join_in1" id="mname" name="mname">
+    <input type="text" class="join_in1" id="mname" name="mname">
     </li>
     <li>※ 이메일</li>
     <li>

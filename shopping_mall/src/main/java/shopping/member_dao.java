@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 public class member_dao {
 	int midx;
-	String admin_id;
 	String mname;
 	String mid;
 	String mpass;

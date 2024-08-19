@@ -346,24 +346,28 @@ public class admin_ddl extends md5_pass{
 	}
 	
 	//일반 회원 리스트 페이지 - 약관 출력
-	public List<terms_dao> update_terms(String term_type, String term_content ) {
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("term_type", term_type);
-		data.put("term_content", term_content);
-		List<terms_dao> result = tm2.selectList("shopping.get_terms",data);
+	public List<terms_dao> get_terms() {
+		List<terms_dao> result = tm2.selectList("shopping.get_terms");
 		return result; 
 	}
 	
 	//일반 회원 리스트 페이지 - 약관 수정
+	public int update_termsok(String term_type, String term_content) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("term_type", term_type);
+		data.put("term_content", term_content);
+		int result = tm2.update("shopping.update_terms",data);
+		return result;
+	}
 	
+
 	
 	//공지사항 게시글 리스트 출력
 	public List<notice_dao> notice_list(String admin_id,Integer startpg, Integer pageno){
-		
 		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("admin_id", admin_id);
 		data.put("startpg", startpg);
 		data.put("pageno", pageno);
+		System.out.println("Data Map: " + data);
 		List<notice_dao> result = tm2.selectList("shopping.notice_list",data);
 		return result;
 	}
@@ -372,7 +376,7 @@ public class admin_ddl extends md5_pass{
 	
 	//공지사항 게시물 조회수
 	public int notice_view_count(String nidx) {
-		int result = tm2.update("shopping.notice_count_view",nidx);
+		int result = tm2.update("shopping.notice_list_count",nidx);
 		return result;
 	}
 	

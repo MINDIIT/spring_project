@@ -65,7 +65,7 @@ public class admin_controller {
 	@GetMapping("/admin/notice_write.do")
 	public String notice_writeok() {
 		
-		return "notice_write";
+		return "./admin_page/notice_write";
 	}
 	
 	//공지사항 view 페이지
@@ -90,7 +90,7 @@ public class admin_controller {
 			viewedNotices.add(nidx);
 		}
 		
-		return "notice_view";
+		return "./admin_page/notice_view";
 	}
 	
 	//공지사항 게시글 수정페이지 출력
@@ -102,7 +102,7 @@ public class admin_controller {
 			m.addAttribute("data",data);
 			m.addAttribute("data2",data2);
 
-		return "/notice_modify";
+		return "./admin_page/notice_modify";
 	}
 	
 	//공지사항 게시물 등록
@@ -158,7 +158,7 @@ public class admin_controller {
 	//카테고리 등록 페이지
 	@GetMapping("/admin/cate_write.do")
 	public String cate_write() {	
-		return "cate_write";
+		return "./admin_page/cate_write";
 	}
 	
 	
@@ -175,7 +175,7 @@ public class admin_controller {
 			e.printStackTrace();
 			System.out.println("db오류-1");
 		}
-		return "product_write";
+		return "./admin_page/product_write";
 	}
 	
 	//카테고리 리스트 페이지 이동
@@ -200,7 +200,7 @@ public class admin_controller {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "cate_list";
+		return "./admin_page/cate_list";
 	}
 	
 	
@@ -222,7 +222,7 @@ public class admin_controller {
 		m.addAttribute("result",result);
 		m.addAttribute("startpg",startpg);
 		
-		return "/notice_list";
+		return "./admin_page/notice_list";
 	}
 	
 	//일반회원 리스트 페이지
@@ -238,11 +238,14 @@ public class admin_controller {
 		}
 		List<member_dao> result = ad.member_list(startpg, pageno);
 		int ctn = ad.member_list_count();
+		List<terms_dao> terms = ad.get_terms();
+		m.addAttribute("privacypolicy",terms.get(0).getTerm_content());
+		m.addAttribute("service_of_terms",terms.get(1).getTerm_content());
 		m.addAttribute("result",result);
 		m.addAttribute("ctn",ctn);
 		m.addAttribute("startpg",startpg);
 		
-		return "/admin_page/shop_member_list";
+		return "./admin_page/shop_member_list";
 	}
 	
 	//상품 리스트 출력 페이지
@@ -269,7 +272,7 @@ public class admin_controller {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "/product_list";
+		return "./admin_page/product_list";
 	}
 	
 	//관리자 추가 페이지 이동
@@ -288,7 +291,7 @@ public class admin_controller {
 		m.addAttribute("sitedata",sitedata);
 		m.addAttribute("companydata", companydata);
 		m.addAttribute("pddata",pddata);
-		return "/admin_siteinfo";
+		return "./admin_page/admin_siteinfo";
 	}
 	
 	//상품 삭제
@@ -448,8 +451,17 @@ public class admin_controller {
 	
 	//이용약관 수정 핸들링
 	@PostMapping("/admin/update_terms.do")
-	public String update_terms(String term_type, String term_content) {
-		
+	public String update_terms(String term_type, String term_content,HttpServletResponse res)throws Exception {
+		this.pw = res.getWriter();
+		try {
+			int callback = ad.update_termsok(term_type, term_content);
+			if(callback>0) {
+				this.pw.print("success");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("fail");
+		}
 		
 		return null;
 	}
@@ -504,7 +516,7 @@ public class admin_controller {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "/admin_list";
+		return "./admin_page/admin_list";
 	}
 	
 	//아이디 중복 체크

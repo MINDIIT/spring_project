@@ -29,8 +29,8 @@
 				<div class="join_agreement_cont">
 					<div class="join_agreement_box">
 						<div class="form_element">
-							<input type="checkbox" id="allAgree"/>
-							<label class="check" for="allAgree"> <em>ShopBag의 모든 약관을 확인하고 전체 동의합니다.</em></label>
+							<input type="checkbox" id="allAgree_ck"/>
+							<label class="check" for="allAgree" id="allAgree"> <em>ShopBag의 모든 약관을 확인하고 전체 동의합니다.</em></label>
 							<span>(전체동의, 선택항목도 포함됩니다.)</span>
 						</div>
 					</div>
@@ -42,7 +42,7 @@
 							<span><a href="#" target="_blank">전체보기</a></span>
 						</div>
 						<div class="agreement_box">
-							
+							${service_of_terms}
 						</div>
 						
 					</div>
@@ -54,7 +54,7 @@
 							<span><a href="#" target="_blank">전체보기</a></span>
 						</div>
 						<div class="agreement_box">
-							
+							${privacypolicy}
 						</div>
 					</div>
 					<div class="important_check_box">
@@ -63,7 +63,7 @@
 				</div>
 				
 				<div class="btn_center_box">
-					<button type="button" id="btnNextStep" class="btn_join">다음단계</button>
+					<button type="button" id="btnNextStep_agree" class="btn_join">다음단계</button>
                 </div>
 			</form>
         </div>

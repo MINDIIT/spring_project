@@ -76,12 +76,12 @@
 </section>
 <section style="width: 1100px; height: auto; margin: 0 auto; margin-top: 30px;">
     <p style="font-size: 15px;font-weight: bolder; margin-bottom: 10px;">■ 이용 약관</p>
-    <textarea <cr:if test="${empty terms}"> placeholder="이용약관에 대한 내용을 입력하세요"</cr:if> <cr:if test="${!empty terms}">value="${terms}"</cr:if> style="width: 100%; height: 100px; resize: none;" id="temsTextArea"></textarea>
+    <textarea style="width: 100%; height: 100px; resize: none;" id="temsTextArea">${service_of_terms}</textarea>
     <input type="button" value="이용약관 수정" title="이용약관 수정" class="btn_button" style="position: relative; left: 100%; margin-left: -100px;" id="btnUpdateTerms">
 </section>
 <section style="width: 1100px; height: auto; margin: 0 auto; margin-top: 30px;">
     <p style="font-size: 15px;font-weight: bolder; margin-bottom: 10px;">■ 개인정보 수집 및 이용</p>
-    <textarea placeholder="개인정보 수집 및 이용" style="width: 100%; height: 100px; resize: none;" id="privacypolicyTextArea"></textarea>
+    <textarea placeholder="개인정보 수집 및 이용" style="width: 100%; height: 100px; resize: none;" id="privacypolicyTextArea" >${privacypolicy}</textarea>
     <input type="button" value="개인정보 약관 수정" title="개인정보 약관 수정" class="btn_button" style="position: relative; left: 100%; margin-left: -100px;" id="btnUpdatePrivacyPolicy">
 </section>
 </main>

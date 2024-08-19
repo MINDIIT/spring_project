@@ -1,6 +1,7 @@
 package shopping;
 
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -10,9 +11,11 @@ import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 
 @Controller
 public class shop_controller {
@@ -22,12 +25,34 @@ public class shop_controller {
 	@Resource(name="mall")
 	private shopping_ddl sd;
 	
-
+	//회원 가입 
+	@PostMapping("/mallpage/member_joinok.do")
+	public String member_join(@ModelAttribute("mall")member_dao dao,HttpServletResponse res) throws Exception {
+		this.pw = res.getWriter();
+		try {
+			int result = sd.member_join(dao);
+			if(result>0) {
+				this.pw.print("<script>"
+						+ "alert('회원 가입이 완료되었습니다.');"
+						+ "location.href='./login.jsp';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류로 인해 회원가입이 완료되지않았습니다.');"
+					+ "location.href=history.go(-1);"
+					+ "</script>");			
+		}
+		return null;
+	}
 	
 	//약관 동의 페이지
 	@GetMapping("/mallpage/agree.do")
-	public String agree_page() {
-		
+	public String agree_page(Model m) {
+		List<terms_dao> terms = sd.get_terms();
+		m.addAttribute("privacypolicy",terms.get(0).getTerm_content());
+		m.addAttribute("service_of_terms",terms.get(1).getTerm_content());		
 		return "./mallpage/agree";
 	}
 	

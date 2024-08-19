@@ -29,15 +29,13 @@
 	
 	<!-- 이용 약관 출력 -->
 	<select id="get_terms" parameterType="Map" resultType="termsdao">
-		SELECT * FROM terms
+		SELECT * FROM terms 
 	</select>
 	
 	<!-- 약관 수정 -->
-	<insert id="terms_modify" parameterType="Map">
-		INSERT INTO terms (tidx,term_type, term_content,create_at,updated_at) VALUES ('0',#{term_type}, #{term_content},now(),now()) 
-		ON DUPLICATE KEY UPDATE
-		term_content = #{term_content};
-	</insert>
+	<update id="update_terms" parameterType="Map">
+		UPDATE terms SET term_content = #{term_content} WHERE term_type = #{term_type}
+	</update>
 	
 	<!-- 관리자 추가 승인대기 -->
 	<insert id="admin_standbyadd" parameterType="admindao">
@@ -274,24 +272,12 @@
 	
 	<!-- 공지사항 게시글 리스트 출력 -->
 	<select id="notice_list" parameterType="Map" resultType="noticedao">
-		SELECT * FROM notice
-		<where>
-			<if test="admin_id !='master'">
-				admin_id =#{admin_id}
-			</if>
-		</where>
-		ORDER BY is_pinned desc, notice_create desc LIMIT #{pageno},#{startpg}
+		SELECT * FROM notice desc LIMIT #{startpg},#{pageno}
 	</select>
 	
 	<!-- 공지사항 게시글 수 -->
 	<select id="notice_list_count" parameterType="Map" resultType="int">
-		SELECT COUNT(*) AS ctn FROM notice
-		<where>
-			<if test="admin_id !='master'">
-				admin_id =#{admin_id}
-			</if>
-		</where>
-		ORDER BY is_pinned asc, notice_create DESC limit #{startpg},#{pageno}
+		SELECT COUNT(*) AS ctn FROM notice DESC LIMIT #{startpg},#{pageno}
 	</select>
 	
 	<!-- 공지사항 게시글 view page 출력 -->
@@ -350,4 +336,5 @@
 	<select id="member_list_count" resultType="int">
 		SELECT COUNT(*) AS ctn FROM member 
 	</select>
+
 </mapper>

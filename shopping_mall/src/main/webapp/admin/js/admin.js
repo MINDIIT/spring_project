@@ -426,9 +426,11 @@ var $id_doubleck=0;
 					term_type : "terms_of_service"
 			},
 			contentType : "application/x-www-form-urlencoded",
-			success : function(response){
-				$('#temsTextArea').val(response);
-				alert('약관이 성공적으로 업데이트 되었습니다.');
+			success : function(result){
+				if(result=="success"){
+					alert('약관이 성공적으로 업데이트 되었습니다.');
+					location.reload();
+				}
 			},error : function(){
 				alert("약관 업데이트 중 오류가 발생했습니다.");
 			}
@@ -445,9 +447,11 @@ var $id_doubleck=0;
 					term_type : "privacypolicy"
 			},
 			contentType : "application/x-www-form-urlencoded",
-			success : function(response){
-				$('#temsTextArea').val(response);
-				alert('약관이 성공적으로 업데이트 되었습니다.');
+			success : function(result){
+				if(result=="success"){
+					alert('약관이 성공적으로 업데이트 되었습니다.');
+					location.reload();
+				}
 			},error : function(){
 				alert("약관 업데이트 중 오류가 발생했습니다.");
 			}
@@ -465,14 +469,3 @@ function disagree(aidx){
 		location.href="./admin_userok.do?agree=Y,"+aidx;
 	}
 }
-////일반 회원 계정 상태 핸들링
-//function account_suspend(midx){
-//	if(confirm('계정을 비활성화 하시겠습니까?')){
-//		location.href="./member_active.do?account_suspended=Y,"+midx;
-//	}
-//}
-//function account_activate(midx){
-//	if(confirm('계정을 활성화 하시겠습니까?')){
-//		location.href="./member_active.do?account_suspended=N,"+midx;
-//	}	
-//}

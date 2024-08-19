@@ -1,6 +1,7 @@
 package shopping;
 
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -15,13 +16,34 @@ import javax.mail.internet.MimeMessage;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+
 @Repository("mall")
-public class shopping_ddl {
+public class shopping_ddl extends md5_pass{
 	
 	PrintWriter pw = null;
 	
 	@Resource(name="TemplateMall")
 	private SqlSessionTemplate tm3;
+	
+	//회원 등록
+	public int member_join(member_dao dao) {
+		dao.setMpass(this.md5_making(dao.getMpass()));
+		if(dao.getSms_ad()==null) {
+			dao.setSms_ad("N");
+		}
+		if(dao.getEmail_ad()==null) {
+			dao.setEmail_ad("N");
+		}
+		int result = tm3.insert("mall.member_join",dao);
+		return result;
+		
+	}
+	
+	//약관 동의페이지 - 약관 출력
+	public List<terms_dao> get_terms() {
+		List<terms_dao> result = tm3.selectList("mall.get_terms");
+		return result; 
+	}	
 	
 	//이메일 인증
 	public String email_verify(String memail,String number) {

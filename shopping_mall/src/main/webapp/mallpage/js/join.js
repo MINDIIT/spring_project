@@ -21,8 +21,7 @@ $(function(){
 			}
 		},1000);
 	}
-
-
+	
 	
 	//아이디 중복 체크 여부
 	var $id_doubleck=0;
@@ -119,13 +118,13 @@ $(function(){
 			} ,contentType : "application/x-www-form-urlencoded",
 			success : function($data){
 				if($data =="success"){
-					alert("인증번호가 발송 되었습니다.");
+					alert("인증번호가 재발송 되었습니다.");
 					startTimer();
 					$('#email_verification').hide();
 					$('#resendBtn').show();
 					$('#verification_code').focus();
 				}else{
-					alert("오류로 인해 인증번호 발송에 실패했습니다.");
+					alert("오류로 인해 인증번호 재발송에 실패했습니다.");
 				}
 			},error : function(error){
 				console.log($error);
@@ -169,7 +168,7 @@ $(function(){
 	
 		
 	//회원 가입 버튼
-	/*
+	
 	$('#btnNextStep').click(function(){
 	
 		var mid = $('#mid').val().trim();
@@ -216,7 +215,7 @@ $(function(){
 		}else if ($('#mname').val().trim()==""){
 			alert('이름을 입력하세요.');
 			$('#mname').focus();
-		}else if(!namePattern.test($('#mname').val().trim())){
+		}else if(!namepattern.test($('#mname').val().trim())){
 			alert('이름에는 한글 또는 영문만 입력할 수 있습니다. 공백, 숫자, 특수문자는 허용되지 않습니다.');
 			$('#mname').focus();
 		}else if($('#mhp').val().trim()==""){
@@ -232,6 +231,6 @@ $(function(){
 		}
 		
 		
-	});	*/
+	});
 	
 });
