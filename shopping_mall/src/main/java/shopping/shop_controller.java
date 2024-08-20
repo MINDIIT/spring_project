@@ -1,5 +1,6 @@
 package shopping;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Controller
@@ -63,7 +65,29 @@ public class shop_controller {
 		return "./mallpage/join";
 	}
 	
+	//메일 인증 코드
 	private String verify_code;
+	
+	
+	//로그인 페이지 - 로그인 핸들링
+	@PostMapping("/mallpage/member_loginok.do")
+	public String member_loginok(@RequestParam String mid,String mpass,HttpServletResponse res) throws Exception {
+		res.setContentType("text/html;charset=utf-8");
+		this.pw = res.getWriter();
+		try {
+			String result = sd.member_login(mid, mpass);
+			if(result.equals("Y")) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 로그인되었습니다.');"
+						+ "</script>");
+			}else {
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	//회원가입 페이지 - 인증 메일 발송
 	@PostMapping("/mallpage/email_verification.do")

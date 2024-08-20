@@ -26,19 +26,19 @@
         <div class="loginview">
           <span class="member_l"></span>
           <span class="login">
-          <form>   
+          <form id="member_login" action="./member_loginok.do" method="post">   
           <table border="0" cellpadding="0" cellspacing="0" class="table_login">
           <tr>
           <td>
-          <input type="text" placeholder="아이디를 입력해주세요" class="id">
+          <input type="text" placeholder="아이디를 입력해주세요" class="id" id="mid" name="mid">
           </td>
           <td rowspan="2">
-          <input type="submit" value="LOGIN" class="btn1">
+          <input type="submit" value="LOGIN" class="btn1" id="member_login_btn">
           </td>
           </tr>
           <tr>
           <td>
-          <input type="password" placeholder="패스워드를 입력해주세요" class="id">
+          <input type="password" placeholder="패스워드를 입력해주세요" class="id" id="mpass" name="mpass">
           </td>
           </tr>
           </table>

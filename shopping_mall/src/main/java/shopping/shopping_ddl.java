@@ -1,7 +1,9 @@
 package shopping;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -24,6 +26,19 @@ public class shopping_ddl extends md5_pass{
 	
 	@Resource(name="TemplateMall")
 	private SqlSessionTemplate tm3;
+	
+	//로그인 페이지 - 로그인 핸들링 (계정 상태 구분해서 로그인 승인필요)
+	public String member_login(String mid,String mpass) {
+		String account_status ="";
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("mid", mid);
+		data.put("mpass",this.md5_making(mpass));
+		int result = tm3.selectOne("mall.member_login",data);
+		if(result>0) { //아이디,패스워드 조회가 됐을 때 계정 상태여부 조회
+			account_status = tm3.selectOne("mall.account_status",data);
+		}
+		return account_status;
+	}
 	
 	//회원 등록
 	public int member_join(member_dao dao) {

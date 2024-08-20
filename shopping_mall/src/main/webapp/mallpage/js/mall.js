@@ -5,6 +5,11 @@ $(function(){
 		location.href='./agree.do';
 	});
 	
+	//로그인 페이지 - 로그인 버튼
+	$('#member_login_btn').click(function(){
+		$('#member_login').submit();
+	});
+	
 	//약관동의 페이지 - 다음단계 버튼
 	$('#btnNextStep').click(function(){
 		location.href='./join.do';
