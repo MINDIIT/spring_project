@@ -27,30 +27,42 @@ $(function(){
 	var $id_doubleck=0;
 	//아이디 중복 확인
 	$('#id_duplicate_check').click(function(){
-		$.ajax({
-			url :'./duplicate_idcheck.do',
-			cache : false,
-			type : "post",
-			dataType : "html",
-			data :{
-				mid : $('#mid').val()
-			} ,
-			contentType : "application/x-www-form-urlencoded",
-			success : function($data){
-				if($data == "duplicate"){
-					alert("이미 사용중인 아이디 입니다.");
-					$("#mid").val("");
-					$("#mid").focus();
-				}else{
-					alert("사용가능한 아이디 입니다.");
-					$id_doubleck =1;
-				}
-			},error : function(error){
-				console.log($error);
-			}
-			
-		})
+		var mid = $('#mid').val().trim();
+		var userid = /^[a-zA-Z0-9]+$/;
 		
+		if($('#mid').val().trim()==""){
+			alert('아이디를 입력하세요');
+			$('#mid').focus();
+		}else if(!userid.test(mid)){
+			alert('아이디는 영문자와 숫자만 허용됩니다.');
+			$('#mid').focus();
+		}else if(mid.length < 6){
+			alert('아이디는 최소 6자 이상이어야 합니다.');
+			$('#mid').focus();
+		}else{
+			$.ajax({
+				url :'./duplicate_idcheck.do',
+				cache : false,
+				type : "post",
+				dataType : "html",
+				data :{
+					mid : $('#mid').val()
+				} ,
+				contentType : "application/x-www-form-urlencoded",
+				success : function($data){
+					if($data == "duplicate"){
+						alert("이미 사용중인 아이디 입니다.");
+						$("#mid").val("");
+						$("#mid").focus();
+					}else{
+						alert("사용가능한 아이디 입니다.");
+						$id_doubleck =1;
+					}
+				},error : function(error){
+					console.log($error);
+				}
+			})			
+		}		
 	});
 	
 	//인증 번호 생성
@@ -192,14 +204,8 @@ $(function(){
 		}		
 		
 		
-		if($('#mid').val()==""){
+		if($('#mid').val().trim()==""){
 			alert('아이디를 입력하세요');
-			$('#mid').focus();
-		}else if(mid.length < 6){
-			alert('아이디는 최소 6자 이상이어야 합니다.');
-			$('#mid').focus();
-		}else if(!userid.test(mid)){
-			alert('아이디는 영문자와 숫자만 허용됩니다.');
 			$('#mid').focus();
 		}else if($('#mpass').val()==""){
 			alert('비밀번호를 입력하세요');

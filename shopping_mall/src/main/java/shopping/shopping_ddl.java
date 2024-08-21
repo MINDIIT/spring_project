@@ -27,6 +27,12 @@ public class shopping_ddl extends md5_pass{
 	@Resource(name="TemplateMall")
 	private SqlSessionTemplate tm3;
 	
+	//로그인 페이지 - footer 회사 정보 출력
+	public List<company_info_dao> Company_info() {
+		List<company_info_dao> data = tm3.selectList("mall.footer_banner");
+		return data;
+	}
+	
 	//로그인 페이지 - 로그인 핸들링 (계정 상태 구분해서 로그인 승인필요)
 	public String member_login(String mid,String mpass) {
 		String account_status ="";

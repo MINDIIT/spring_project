@@ -21,5 +21,9 @@
 <!-- 회원 계정 상태 조회 -->
 	<select id="account_status" parameterType="Map" resultType="String">
 		SELECT account_suspended FROM member WHERE mid=#{mid} 
+	</select>
+<!-- 로그인 페이지 - footer 배너 회사 정보 출력 -->	
+	<select id="footer_banner" resultType="companyinfodao">
+		SELECT * FROM company_info ORDER BY sidx DESC LIMIT 1
 	</select>	
 </mapper>

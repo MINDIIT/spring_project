@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,14 @@ public class shop_controller {
 	
 	@Resource(name="mall")
 	private shopping_ddl sd;
+	
+	//로그인 페이지 - 하단 배너 회사 정보 출력
+	@GetMapping("/mallpage/loginpage_footer.do")
+	public String loginpage_footer(Model m) {
+		List<company_info_dao> data = sd.Company_info();
+		m.addAttribute("company_info",data);
+		return "./mallpage/mall_footer";
+	}
 	
 	//회원 가입 
 	@PostMapping("/mallpage/member_joinok.do")
@@ -71,20 +80,29 @@ public class shop_controller {
 	
 	//로그인 페이지 - 로그인 핸들링
 	@PostMapping("/mallpage/member_loginok.do")
-	public String member_loginok(@RequestParam String mid,String mpass,HttpServletResponse res) throws Exception {
+	public String member_loginok(@RequestParam String mid,String mpass,HttpServletResponse res,HttpServletRequest req) throws Exception {
 		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();
 		try {
 			String result = sd.member_login(mid, mpass);
 			if(result.equals("Y")) {
+				HttpSession hs =req.getSession();
+				hs.setAttribute("mid", mid);
 				this.pw.print("<script>"
-						+ "alert('정상적으로 로그인되었습니다.');"
+						+ "alert('"+mid+"님 환영합니다.');"
 						+ "</script>");
 			}else {
-				
+				this.pw.print("<script>"
+						+ "alert('휴면 계정입니다. 휴면상태 해제 후 로그인 하실 수 있습니다.');"
+						+ "location.href='/login.jsp';"
+						+ "</script>");				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('아이디와 비밀번호를 확인하세요.');"
+					+ "location.href='/login.jsp';"
+					+ "</script>");							
 		}
 		return null;
 	}

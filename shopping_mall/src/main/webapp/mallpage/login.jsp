@@ -19,7 +19,6 @@
  <main>
     <div class="products">
       <h3>MEMBER_LOGIN</h3>
-      <h5>${admin_id}의 사이트</h5>
       <div class="sub_view">
         
 
@@ -80,6 +79,6 @@
       </div>
     </div>
 </main>
-<%@ include file="/mallpage/mall_footer.jsp" %>
+<%@ include file="../WEB-INF/views/mallpage/mall_footer.jsp" %>
   </body>
 </html>

@@ -6,5 +6,6 @@
 	<typeAliases>
 		<typeAlias alias="memberdao" type="shopping.member_dao"/>
 		<typeAlias alias="termsdao" type="shopping.terms_dao"/>
+		<typeAlias alias="companyinfodao" type="shopping.company_info_dao"/>
 	</typeAliases>
 </configuration>    

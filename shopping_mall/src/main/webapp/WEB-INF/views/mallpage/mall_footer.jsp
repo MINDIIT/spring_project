@@ -18,7 +18,7 @@
         <ul>
         <li><img src="../mallpage/images/foot_logo.png"></li>
         <li>
-회사명 :  
+회사명 : ${company_info[0].company_name} 
 대표자 : 
 주소 :   <br>
 고객센터 : 

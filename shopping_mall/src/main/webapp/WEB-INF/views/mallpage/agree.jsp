@@ -70,6 +70,6 @@
       </div>
     </div>
 </main>
-<%@ include file="/mallpage/mall_footer.jsp" %>
+<%@ include file="../mallpage/mall_footer.jsp" %>
   </body>
 </html>
