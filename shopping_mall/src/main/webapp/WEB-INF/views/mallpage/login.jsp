@@ -15,7 +15,7 @@
 	<script src="./js/mall.js?v=<%=today%>"></script>
   </head>
   <body>
-<%@ include file="/mallpage/mall_header.jsp" %>
+<%@ include file="../mallpage/mall_header.jsp" %>
  <main>
     <div class="products">
       <h3>MEMBER_LOGIN</h3>
@@ -43,7 +43,7 @@
           </table>
               
           <div class="check1">
-          <input type="checkbox" id="l"> <label for="l" class="label_login">아이디 저장</label>
+          <input type="checkbox" id="rememberMe"> <label for="l" class="label_login">아이디 저장</label>
           </div>
           </form>
           <ul class="btns_login">
@@ -79,6 +79,6 @@
       </div>
     </div>
 </main>
-<%@ include file="../WEB-INF/views/mallpage/mall_footer.jsp" %>
+<%@ include file="../mallpage/mall_footer.jsp" %>
   </body>
 </html>

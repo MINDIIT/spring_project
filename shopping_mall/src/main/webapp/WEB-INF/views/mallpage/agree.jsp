@@ -17,7 +17,7 @@
   </head>
 
   <body>
-<%@ include file="/mallpage/mall_header.jsp" %>
+<%@ include file="../mallpage/mall_header.jsp" %>
  <main>
     <div class="products">
       <h3>MEMBER_JOIN</h3>

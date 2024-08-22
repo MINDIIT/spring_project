@@ -19,14 +19,14 @@
         <li><img src="../mallpage/images/foot_logo.png"></li>
         <li>
 회사명 : ${company_info[0].company_name} 
-대표자 : 
-주소 :   <br>
-고객센터 : 
+대표자 : ${company_info[0].ceo_name}
+주소 : ${company_info[0].business_location_address}  <br>
+고객센터 : ${company_info[0].company_phone_number}
 상담시간 : 
 E-Mail : 
-사업자등록번호 :  <br>
-통신판매업신고번호 : 
-개인정보보호책임자 :    <br>
+사업자등록번호 : ${company_info[0].business_registration_number} <br>
+통신판매업신고번호 : ${company_info[0].online_business_registration_number}
+개인정보보호책임자 : ${company_info[0].data_protection_officer_name}   <br>
 Copyright © 도메인명 All Rights Reserved.
         </li>
         </ul>    

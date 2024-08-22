@@ -28,12 +28,12 @@ public class shop_controller {
 	@Resource(name="mall")
 	private shopping_ddl sd;
 	
-	//로그인 페이지 - 하단 배너 회사 정보 출력
-	@GetMapping("/mallpage/loginpage_footer.do")
+	//로그인 페이지 - 하단 배너 회사 정보 출력 기능
+	@GetMapping("/mallpage/login.do")
 	public String loginpage_footer(Model m) {
 		List<company_info_dao> data = sd.Company_info();
 		m.addAttribute("company_info",data);
-		return "./mallpage/mall_footer";
+		return "./mallpage/login";
 	}
 	
 	//회원 가입 
@@ -94,14 +94,14 @@ public class shop_controller {
 			}else {
 				this.pw.print("<script>"
 						+ "alert('휴면 계정입니다. 휴면상태 해제 후 로그인 하실 수 있습니다.');"
-						+ "location.href='/login.jsp';"
+						+ "location.href='./login.do';"
 						+ "</script>");				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
 					+ "alert('아이디와 비밀번호를 확인하세요.');"
-					+ "location.href='/login.jsp';"
+					+ "location.href='./login.do';"
 					+ "</script>");							
 		}
 		return null;

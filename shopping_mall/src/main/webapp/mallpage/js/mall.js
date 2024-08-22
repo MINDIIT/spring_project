@@ -7,6 +7,11 @@ $(function(){
 	
 	//로그인 페이지 - 로그인 버튼
 	$('#member_login_btn').click(function(){
+		if($('#rememberMe').is(':checked')){
+			var userId = $('#mid').val();
+			
+			
+		}
 		$('#member_login').submit();
 	});
 	
@@ -41,3 +46,9 @@ $(function(){
 		}
 	});
 })
+function setCookie(name,value,days){
+	var date = new Date();
+	date.setTime(date.getTime()+(days*24*60*60*1000));
+	var expires = 'expires='+date.toUTCString();
+	document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}

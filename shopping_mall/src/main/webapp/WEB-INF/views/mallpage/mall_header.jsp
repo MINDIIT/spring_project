@@ -7,7 +7,7 @@
         </a>
         <ul id="menu">
         	<cr:if test="${mid==null}">
-          		<li><a href="./login.jsp">LOGIN</a></li>
+          		<li><a href="./login.do">LOGIN</a></li>
           	</cr:if>
           	<cr:if test="${!empty mid}">
           		<li><a href="#">MEMBER SHIP</a></li>
