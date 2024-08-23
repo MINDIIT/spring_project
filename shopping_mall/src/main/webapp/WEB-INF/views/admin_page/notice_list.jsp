@@ -45,9 +45,9 @@
         <li>날짜</li>
         <li>조회</li>
     </ul>
-    <cr:if test="${result!=null}">
-    <cr:set var="ino" value="${ctn-startpg}"/>
-    <cr:forEach var="data" items="${result}" step="1" varStatus="idx">
+    <cr:if test="${result_nt!=null}">
+    <cr:set var="ino" value="${ctn-startpg_nt}"/>
+    <cr:forEach var="data" items="${result_nt}" step="1" varStatus="idx">
     <ol>
         <li><input type="checkbox"name="product_ck" value="${data.nidx}"></li>
         <li>${ino-idx.index}</li>
@@ -62,7 +62,7 @@
     </ol>
     </cr:forEach>
     </cr:if>
-    <cr:if test="${empty result}">
+    <cr:if test="${empty result_nt}">
     <ol class="none_text">
         <li>등록된 공지 내용이 없습니다.</li>
     </ol>
@@ -72,7 +72,7 @@
         <button class="border_del" id="notice_delete_btn">공지삭제</button>
         <button class="border_add" id="notice_write_btn">공지등록</button>
     </div>
-    <cr:if test="${!empty result}">
+    <cr:if test="${result_nt!=null}">
     <div class="border_page">
         <ul class="pageing">
             <li><img src="./ico/double_left.svg"></li>

@@ -1,20 +1,22 @@
 $(function(){
 
   	let countdown; //타이머 변수
-  	let remainigTime = 180;
-  	
+  	let remainingTime = 180;
+  	//setInterval 쓰면 멈췄다가 다시 진행시켜도 시계가 계속 돌고있음, 
+	//그래서 setTimeout 써야함
   	function startTimer() {
 	     if (countdown) {
-	        clearInterval(countdown);
+	        clearTimeout(countdown);
 	    } 	
-		countdown = setInterval(function() {
-			remainigTime--;
-			const minutes = Math.floor(remainigTime/60);
-			const seconds = remainigTime % 60;
+		countdown = setTimeout(function tick() {
+			remainingTime--;
+			const minutes = Math.floor(remainingTime/60);
+			const seconds = remainingTime % 60;
 			$('#timer').text(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
-			
-			if (remainigTime <= 0) {
-				clearInterval(countdown);
+			if (remainingTime >0 ) {
+				countdown = setTimeout(tick, 1000);
+			}else{
+				clearTimeout(countdown);
 				countdown = null; //타이머 변수 초기화
 				$('#email_verification').hide();
 				$('#timer').text('유효시간 만료');

@@ -272,12 +272,12 @@
 	
 	<!-- 공지사항 게시글 리스트 출력 -->
 	<select id="notice_list" parameterType="Map" resultType="noticedao">
-		SELECT * FROM notice desc LIMIT #{startpg},#{pageno}
+		SELECT * FROM notice order by nidx desc limit #{startpg},#{pageno}
 	</select>
 	
 	<!-- 공지사항 게시글 수 -->
 	<select id="notice_list_count" parameterType="Map" resultType="int">
-		SELECT COUNT(*) AS ctn FROM notice DESC LIMIT #{startpg},#{pageno}
+		SELECT COUNT(*) AS ctn FROM notice order by nidx 
 	</select>
 	
 	<!-- 공지사항 게시글 view page 출력 -->

@@ -208,9 +208,9 @@ public class admin_controller {
 	@GetMapping("/admin/notice_list.do")
 	public String notice_list (@RequestParam(value = "",required = false)Integer page,Model m,HttpServletRequest req) {
 		int pageno = 15;
-		int startpg=0;
+		int startpg = 0;
 			if(page==null||page==1) {
-				startpg=0;
+				startpg = 0;
 			}else {
 				startpg = (page-1)*pageno;
 			}			
@@ -219,8 +219,8 @@ public class admin_controller {
 		int ctn = ad.notice_list_count((String)hs.getAttribute("admin_id"));
 		System.out.println(result);
 		m.addAttribute("ctn",ctn);
-		m.addAttribute("result",result);
-		m.addAttribute("startpg",startpg);
+		m.addAttribute("result_nt",result);
+		m.addAttribute("startpg_nt",startpg);
 		
 		return "./admin_page/notice_list";
 	}
@@ -548,9 +548,9 @@ public class admin_controller {
 			HttpSession hs = req.getSession();
 			String admin_id = (String)hs.getAttribute("admin_name");
 			if(admin_id==null) {
-				this.pw.print("<script>alert('잘못된 접근 입니다.');location.href='./index.jsp';</script>");
+				this.pw.print("<script>alert('잘못된 접근 입니다.');location.href='./index';</script>");
 			}
-			this.pw.print("<script>alert('정상적으로 로그아웃 되셨습니다.');location.href='./index.jsp';</script>");
+			this.pw.print("<script>alert('정상적으로 로그아웃 되셨습니다.');location.href='./index';</script>");
 			hs.invalidate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -579,14 +579,14 @@ public class admin_controller {
 			}else if(data.getAdmin_id() != null && data.getAdmin_confirm().equals("N")) {
 				this.pw.print("<script>"
 						+ "alert('관리자 등록 승인되지 않았습니다. 승인된 후 로그인 시도하세요.');"
-						+ "location.href='./index.jsp';"
+						+ "location.href='./index';"
 						+ "</script>");				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
 					+ "alert('아이디와 비밀번호를 확인하세요.');"
-					+ "location.href='./index.jsp';"
+					+ "location.href='./index';"
 					+ "</script>");
 		}finally {
 			this.pw.close();
@@ -619,4 +619,10 @@ public class admin_controller {
 		return null;
 	}
 
+	//관리자 로그인 페이지
+	@GetMapping("/admin/index")
+	public String admin_index() {
+		
+		return "./admin_page/index";
+	}
 }

@@ -18,7 +18,7 @@
 <script src="./js/admin.js"></script>
 <body class="bodycss">
     <header class="admin_title">
-        <p><img src="./img/logo.png" class="logo_sm"> ADMINISTRATOR</p>
+        <p><img src="../img/logo.png" class="logo_sm"> ADMINISTRATOR</p>
     </header>
     <section class="admin_bgcolor">
     <form id="frm_login" method="post" action="./admin_login.do">
@@ -44,7 +44,7 @@
         </div>
         </form>
     </section>
-	<%@ include file="./footer.jsp" %>
+	<%@ include file="/admin/footer.jsp" %>
 </body>
 <script>
 

@@ -363,11 +363,10 @@ public class admin_ddl extends md5_pass{
 
 	
 	//공지사항 게시글 리스트 출력
-	public List<notice_dao> notice_list(String admin_id,Integer startpg, Integer pageno){
+	public List<notice_dao> notice_list(String admin_id,int startpg, int pageno){
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("startpg", startpg);
 		data.put("pageno", pageno);
-		System.out.println("Data Map: " + data);
 		List<notice_dao> result = tm2.selectList("shopping.notice_list",data);
 		return result;
 	}
