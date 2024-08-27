@@ -85,6 +85,6 @@
     <input type="button" value="개인정보 약관 수정" title="개인정보 약관 수정" class="btn_button" style="position: relative; left: 100%; margin-left: -100px;" id="btnUpdatePrivacyPolicy">
 </section>
 </main>
-<%@ include file="/admin/footer.jsp" %>
+<%@ include file="../admin_page/footer.jsp" %>
 </body>
 </html>

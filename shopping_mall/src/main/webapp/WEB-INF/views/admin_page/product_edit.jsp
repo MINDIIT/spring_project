@@ -28,60 +28,70 @@
  <input type="hidden" id="classification_code" name="classification_code">
  <input type="hidden" id="main_menu_code" name="main_menu_code">
  
-<p>상품 등록 페이지</p>
+<p>상품 수정 페이지</p>
 <div class="product_insert">
     <ul>
         <li>대메뉴 카테고리</li>
         <li>
-            <select class="product_input1" id="main_menu_name" name="main_menu_name">
+            <select class="product_input1" id="main_menu_name" name="main_menu_name" value="products_info[0].main_menu_name">
             <cr:forEach var="data" items="${result}">
-                <option value="${data.main_menu_name}" data-main-menu-code="${data.main_menu_code}" data-classification-code="${data.classification_code}">${data.main_menu_name}</option>
+                <option value="${data.main_menu_name}" data-main-menu-code="${data.main_menu_code}" data-classification-code="${data.classification_code}"
+                 <c:if test="${data.main_menu_name == products_info[0].main_menu_name}">
+                    selected
+                </c:if>>${data.main_menu_name}</option>
             </cr:forEach>   
             </select>
-            <input type="button" value="카테고리 등록" title="카테고리 등록" class="product_btn" id="cate_add"> <span class="help_text">※ 해당 카테고리가 없을 경우 신규 등록하시길 바랍니다.</span>
+            <input type="button" value="카테고리 등록" title="카테고리 등록" class="product_btn" id="cate_add"> 
+            <span class="help_text">※ 해당 카테고리가 없을 경우 신규 등록하시길 바랍니다.</span>
         </li>
     </ul>
     <ul>
         <li>상품코드</li>
         <li>
-            <input type="text" class="product_input1" id="product_code" name="product_code"> 
-            <input type="button" value="중복확인" title="중복확인" class="product_btn" id="product_btn"> <span class="help_text">※ 상품코드는 절대 중복되지 않도록 합니다.</span>
+            <input type="text" class="product_input1" id="product_code_edit" name="product_code" value="${products_info[0].product_code}">  
         </li>
     </ul>
     <ul>
         <li>상품명</li>
         <li>
-            <input type="text" class="product_input2" maxlength="100" id="product_name" name="product_name"> <span class="help_text">※ 상품명은 최대 100자까지만 적용할 수 있습니다.</span>
+            <input type="text" class="product_input2" maxlength="100" id="product_name" name="product_name" value="${products_info[0].product_name}"> 
+            <span class="help_text">※ 상품명은 최대 100자까지만 적용할 수 있습니다.</span>
         </li>
     </ul>
     <ul>
         <li>상품 부가설명</li>
         <li>
-            <input type="text" class="product_input4" maxlength="200" id="product_additional_description" name="product_additional_description"> <span class="help_text">※ 상품명은 최대 200자까지만 적용할 수 있습니다.</span>
+            <input type="text" class="product_input4" maxlength="200" id="product_additional_description" name="product_additional_description" value="${products_info[0].product_additional_description}"> 
+            <span class="help_text">※ 상품명은 최대 200자까지만 적용할 수 있습니다.</span>
         </li>
     </ul>
     <ul>
         <li>판매가격</li>
         <li>
-            <input type="text" class="product_input3" maxlength="7" id="product_price" name="product_price"> <span class="help_text">※ , 없이 숫자만 입력하세요 최대 7자리</span>
+            <input type="text" class="product_input3" maxlength="7" id="product_price" name="product_price" value="${products_info[0].product_price}"> 
+            <span class="help_text">※ , 없이 숫자만 입력하세요 최대 7자리</span>
         </li>
     </ul>
     <ul>
         <li>할인율</li>
         <li>
-            <input type="text" class="product_input3" maxlength="2" value="0" id="discount_rate" name="discount_rate">% <span class="help_text">※ 숫자만 입력하세요</span>
+            <input type="text" class="product_input3" maxlength="2" value="0" id="discount_rate" name="discount_rate" value="${products_info[0].discount_rate}">% 
+            <span class="help_text">※ 숫자만 입력하세요</span>
         </li>
     </ul>
     <ul>
         <li>할인가격</li>
         <li>
-            <input type="text" class="product_input3" maxlength="7" value="0" readonly id="discount_price" name="discount_price"> <span class="help_text">※ 할인율이 0%일 경우 할인가격은 0으로 처리 합니다.</span>
+            <input type="text" class="product_input3" maxlength="7" value="0" readonly id="discount_price" name="discount_price" value="${products_info[0].discount_price}"> 
+            <span class="help_text">※ 할인율이 0%일 경우 할인가격은 0으로 처리 합니다.</span>
         </li>
     </ul>
     <ul>
         <li>상품재고</li>
         <li>
-            <input type="text" class="product_input3" maxlength="4" value="0" id="product_stock" name="product_stock">EA <span class="help_text">※ 숫자만 입력하세요. 재고가 0일 경우 soldout이 됩니다.</span>
+            <input type="text" class="product_input3" maxlength="4" value="0" id="product_stock" name="product_stock" value="${products_info[0].product_stock}">EA 
+            <span class="help_text">※ 숫자만 입력하세요. 재고가 0일 경우 soldout이 됩니다.
+            </span>
         </li>
     </ul>
     <ul>

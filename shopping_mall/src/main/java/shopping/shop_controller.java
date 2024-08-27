@@ -28,6 +28,15 @@ public class shop_controller {
 	@Resource(name="mall")
 	private shopping_ddl sd;
 	
+	//쇼핑몰 메인 페이지 출력
+	@GetMapping("/mallpage/mall_index")
+	public String mall_index(Model m) {
+		List<company_info_dao> data = sd.Company_info();
+		m.addAttribute("company_info",data);		
+		return "./mallpage/mall_index";
+	}
+	
+	
 	//로그인 페이지 - 하단 배너 회사 정보 출력 기능
 	@GetMapping("/mallpage/login.do")
 	public String loginpage_footer(Model m) {
@@ -63,14 +72,17 @@ public class shop_controller {
 	public String agree_page(Model m) {
 		List<terms_dao> terms = sd.get_terms();
 		m.addAttribute("privacypolicy",terms.get(0).getTerm_content());
-		m.addAttribute("service_of_terms",terms.get(1).getTerm_content());		
+		m.addAttribute("service_of_terms",terms.get(1).getTerm_content());
+		List<company_info_dao> data = sd.Company_info();
+		m.addAttribute("company_info",data);		
 		return "./mallpage/agree";
 	}
 	
 	//회원가입 페이지 출력
 	@GetMapping("/mallpage/join.do")
-	public String user_join() {
-		
+	public String user_join(Model m) {
+		List<company_info_dao> data = sd.Company_info();
+		m.addAttribute("company_info",data);		
 		return "./mallpage/join";
 	}
 	
@@ -85,11 +97,12 @@ public class shop_controller {
 		this.pw = res.getWriter();
 		try {
 			String result = sd.member_login(mid, mpass);
-			if(result.equals("Y")) {
+			if(result.equals("N")) {
 				HttpSession hs =req.getSession();
 				hs.setAttribute("mid", mid);
 				this.pw.print("<script>"
 						+ "alert('"+mid+"님 환영합니다.');"
+								+ "location.href='./mall_index';"
 						+ "</script>");
 			}else {
 				this.pw.print("<script>"

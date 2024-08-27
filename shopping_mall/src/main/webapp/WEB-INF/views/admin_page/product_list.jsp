@@ -80,7 +80,7 @@
         <li>${data.product_stock}</li>
         <li>${data.is_available}</li>
         <li>${data.is_sold_out_early}</li>
-        <li>관리</li>
+        <li><a href="./product_edit.do?pidx=${data.pidx}">관리</a></li>
     </ul>
     </cr:forEach>
     </cr:if>
@@ -113,7 +113,7 @@
 </div>
 </section>
 </main>
-<%@ include file="/admin/footer.jsp" %>
+<%@ include file="../admin_page/footer.jsp" %>
 </body>
 <script>
 var ck ="${search_part}";

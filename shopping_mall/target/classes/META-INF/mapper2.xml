@@ -90,7 +90,10 @@
 		insert into products (pidx,admin_id,classification_code,main_menu_code,main_menu_name,product_code,product_name,product_additional_description,product_price,discount_rate,discount_price,product_stock,is_available,is_sold_out_early,main_product_image1,main_product_image2,main_product_image3,product_detailed_description,product_insert_time)
 		values ('0',#{admin_id},#{classification_code},#{main_menu_code},#{main_menu_name},#{product_code},#{product_name},#{product_additional_description},#{product_price},#{discount_rate},#{discount_price},#{product_stock},#{is_available},#{is_sold_out_early},#{main_product_image1},#{main_product_image2},#{main_product_image3},#{product_detailed_description},now())
 	</insert>
-	
+	<!-- 상품 수정 페이지 출력 -->
+	<select id="product_edit" resultType="productsdao" parameterType="Map">
+		SELECT * FROM products WHERE pidx=#{pidx}
+	</select>
 	
 	<!-- 상품 리스트 갯수, 검색된 리스트 갯수 -->
 	<select id="product_count" resultType="int" parameterType="Map">

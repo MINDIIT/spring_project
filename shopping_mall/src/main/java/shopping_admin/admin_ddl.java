@@ -29,6 +29,14 @@ public class admin_ddl extends md5_pass{
 	@Resource(name="Template2")
 	private SqlSessionTemplate tm2;
 	
+	//상품 수정 페이지 출력
+	public List<products_dao> product_edit(String pidx){
+		//pidx 로 해당 데이터 다 끌어오기
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("pidx", pidx);
+		List<products_dao> result = tm2.selectList("shopping.product_edit",data);
+		return result;
+	}
 
 	//상품 리스트 갯수 
 	public int product_list_ea(String admin_id,String search_part,String search_word) {

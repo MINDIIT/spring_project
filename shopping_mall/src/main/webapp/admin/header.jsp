@@ -14,7 +14,7 @@
         <%if(admin_name!=null){ %>
         <p><%=admin_name%> 관리자 <a href="#">[개인정보 수정]</a> <a href="./admin_logout.do">[로그아웃]</a></p>
         <%}else{ 
-        	out.print("<script>alert('로그인이 필요합니다.');location.href='./index.jsp';</script>");	
+        	out.print("<script>alert('로그인이 필요합니다.');location.href='./index.do';</script>");	
         }%>
     </div>
 </header>

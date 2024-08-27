@@ -72,6 +72,6 @@
 </form>
 </section>
 </main>
-<%@ include file="/admin/footer.jsp" %>
+<%@ include file="../admin_page/footer.jsp" %>
 </body>
 </html>

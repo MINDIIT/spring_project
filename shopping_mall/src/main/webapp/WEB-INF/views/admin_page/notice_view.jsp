@@ -71,6 +71,6 @@
     <iframe id="fileContent" style="width:100%; height:90%; border:none;"></iframe>
 </div>
 </main>
-<%@ include file="/admin/footer.jsp" %>
+<%@ include file="../admin_page/footer.jsp" %>
 </body>
 </html>

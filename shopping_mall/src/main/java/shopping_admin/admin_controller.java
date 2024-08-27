@@ -248,33 +248,6 @@ public class admin_controller {
 		return "./admin_page/shop_member_list";
 	}
 	
-	//상품 리스트 출력 페이지
-	@GetMapping("/admin/product_list.do")
-	public String product_list(@RequestParam(value = "",required = false)Integer page ,Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
-		HttpSession hs = req.getSession();
-		int pageno = 5;//한페이지 당 5개 씩
-		int startpg = 0;
-		try {
-			//페이징
-			if(page==null||page==1) {
-				startpg=0;
-			}else {
-				startpg = (page-1)*pageno;
-			}
-			//검색 기능
-			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word,pageno,startpg);
-			int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);				
-				m.addAttribute("result",result);
-				m.addAttribute("ctn",ctn);
-				m.addAttribute("search_part",search_part);
-				m.addAttribute("search_word",search_word);
-				m.addAttribute("startpg",startpg);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "./admin_page/product_list";
-	}
-	
 	//관리자 추가 페이지 이동
 	@GetMapping("/admin/add_master.do")
 	public String add_master() {
@@ -376,6 +349,41 @@ public class admin_controller {
 		return null;
 	}
 	
+	//상품 수정 페이지 출력
+	@GetMapping("/admin/product_edit.do")
+	public String product_edit(String pidx,Model m) {
+		System.out.println(pidx);
+		List<products_dao> result = ad.product_edit(pidx);
+		m.addAttribute("products_info",result);
+		return "./admin_page/product_edit";
+	}
+	
+	//상품 리스트 출력 페이지
+	@GetMapping("/admin/product_list.do")
+	public String product_list(@RequestParam(value = "",required = false)Integer page ,Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
+		HttpSession hs = req.getSession();
+		int pageno = 5;//한페이지 당 5개 씩
+		int startpg = 0;
+		try {
+			//페이징
+			if(page==null||page==1) {
+				startpg=0;
+			}else {
+				startpg = (page-1)*pageno;
+			}
+			//검색 기능
+			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word,pageno,startpg);
+			int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);				
+				m.addAttribute("result",result);
+				m.addAttribute("ctn",ctn);
+				m.addAttribute("search_part",search_part);
+				m.addAttribute("search_word",search_word);
+				m.addAttribute("startpg",startpg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "./admin_page/product_list";
+	}
 	
 	//상품 등록
 	@PostMapping("/admin/product_insertok.do")
@@ -548,9 +556,9 @@ public class admin_controller {
 			HttpSession hs = req.getSession();
 			String admin_id = (String)hs.getAttribute("admin_name");
 			if(admin_id==null) {
-				this.pw.print("<script>alert('잘못된 접근 입니다.');location.href='./index';</script>");
+				this.pw.print("<script>alert('잘못된 접근 입니다.');location.href='./admin_page/index.do';</script>");
 			}
-			this.pw.print("<script>alert('정상적으로 로그아웃 되셨습니다.');location.href='./index';</script>");
+			this.pw.print("<script>alert('정상적으로 로그아웃 되셨습니다.');location.href='./admin_page/index.do';</script>");
 			hs.invalidate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -579,14 +587,14 @@ public class admin_controller {
 			}else if(data.getAdmin_id() != null && data.getAdmin_confirm().equals("N")) {
 				this.pw.print("<script>"
 						+ "alert('관리자 등록 승인되지 않았습니다. 승인된 후 로그인 시도하세요.');"
-						+ "location.href='./index';"
+						+ "location.href='./admin_page/index.do';"
 						+ "</script>");				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
 					+ "alert('아이디와 비밀번호를 확인하세요.');"
-					+ "location.href='./index';"
+					+ "location.href='./admin_page/index.do';"
 					+ "</script>");
 		}finally {
 			this.pw.close();
@@ -620,7 +628,7 @@ public class admin_controller {
 	}
 
 	//관리자 로그인 페이지
-	@GetMapping("/admin/index")
+	@GetMapping("/admin/index.do")
 	public String admin_index() {
 		
 		return "./admin_page/index";
