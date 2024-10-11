@@ -1,14 +1,19 @@
 package shopping_admin;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.print.DocFlavor.STRING;
@@ -37,6 +42,11 @@ public class admin_ddl extends md5_pass{
 		List<products_dao> result = tm2.selectList("shopping.product_edit",data);
 		return result;
 	}
+	//상품 수정 페이지 대메뉴 출력
+	public List<cate_code_dao> cateAllData(){
+		List<cate_code_dao> result = tm2.selectList("shopping.cateforProductsModify");
+		return result;
+	}
 
 	//상품 리스트 갯수 
 	public int product_list_ea(String admin_id,String search_part,String search_word) {
@@ -51,6 +61,43 @@ public class admin_ddl extends md5_pass{
 		return result;
 	}
 	
+	//상품 기본 정보 db 저장
+	public int product_insert(products_dao dao) {
+		int result = tm2.insert("shopping.product_insert", dao);
+		return dao.getPidx();
+	}
+	
+	//상품 등록 시 이미지 db 저장
+	public int saveProductImage(int productId, String imagePath, String imageType) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("productId", productId);
+	    params.put("imagePath", imagePath);
+	    params.put("imageType", imageType);
+	    return tm2.insert("shopping.saveProductImage", params);	
+	}
+		   // 파일 업로드 메서드
+	 public String uploadFile(MultipartFile file) throws IOException {
+	     // 파일 저장 디렉토리 설정
+	     String uploadDir = "/upload/";
+	     
+	     // 고유한 파일명 생성 (UUID를 사용하여 파일 이름을 유니크하게 만듭니다)
+	     String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+	     
+	     // 저장할 파일 경로 설정
+	     Path filePath = Paths.get(uploadDir + fileName);
+	     System.out.println(filePath);
+	     // 파일 디렉토리가 존재하지 않으면 생성
+	     File directory = new File(uploadDir);
+	     if (!directory.exists()) {
+	         directory.mkdirs();
+	     }
+	
+	     // 파일 저장
+	     Files.write(filePath, file.getBytes());
+	     
+	     // 파일 경로 반환
+	     return filePath.toString();
+	 }
 	//상품 삭제
 	public int product_delete(String pidx,HttpServletRequest req) {
 		String[] pidxdata = pidx.split(",");
@@ -93,6 +140,7 @@ public class admin_ddl extends md5_pass{
 			}
 		}
 	}
+	
 	//공지사항 게시글 등록
 	public String  notice_insert(notice_dao dao, List<MultipartFile> files,HttpServletRequest req) {
 		String callback = "";
@@ -138,118 +186,86 @@ public class admin_ddl extends md5_pass{
 	}
 	
 	//공지사항 수정페이지 - 수정 버튼
-	public String notice_modify(notice_dao dao,HttpServletRequest req ,List<String> filestodelete, List<MultipartFile> newfiles) {
+	public String notice_modify(notice_dao dao,HttpServletRequest req ,
+			List<String> filestodelete, List<MultipartFile> newfiles) {
 		//수정 정보 업데이트
-		System.out.println(dao.getIs_pinned());
 		String result ="";
-		int update_result = tm2.update("shopping.update_notice",dao);
-		int remove_file = 0;
-		int save_file =0;
-		//기존 파일 삭제
-		if(filestodelete!=null&&!filestodelete.isEmpty()) {
-			for(String filePath : filestodelete) {
-				delete_realfile(filePath);
-			}
-			remove_file =tm2.delete("shopping.delete_file_path",filestodelete);
-		}
-		//새로운 파일 저장
-		if(newfiles !=null && !newfiles.isEmpty()) {
-			List<notice_attachments_dao> attaachments = save_newfiles(dao,newfiles, req,dao.getNidx());
-			save_file=tm2.insert("shopping.modify_insert_attachment",attaachments);
-		}
-		if(update_result>0 && remove_file>0 && save_file>0) {
-			result = "ok";
-		}else {
-			result ="no";
-		}
-		return result;
-	}
-	
-	//공지샤항 수정페이지 - 기존 파일 실제 삭제 메소드
-	private void delete_realfile(String filePath) {
-		File file = new File(filePath);
-		if(file.exists()) {
-			file.delete();
-		}
-	}
-	
-	//공지사항 수정페이지 - 새로운 첨부파일 실제 저장 메소드 
-	private List<notice_attachments_dao> save_newfiles(notice_dao dao,List<MultipartFile> files,HttpServletRequest req,int nidx){
-		List<notice_attachments_dao> attachments = new ArrayList<>();
-		notice_attachments_dao attch_dao = new notice_attachments_dao();
-		for(MultipartFile file : files) {
-			if(!file.isEmpty()) {
-				String url = req.getServletContext().getRealPath("/upload/");
-				String filename = file.getOriginalFilename();
-				String filepath = url+filename;
-				File f = new File(filepath);
-				try {
-					file.transferTo(f);
-					} catch (Exception e) {
-						e.printStackTrace();
+		boolean fileOperationsSuccessful = true;//파일 작업 성공 여부 플래그
+		try {
+			//기존 파일 삭제
+			if(filestodelete != null && !filestodelete.isEmpty()) {
+				for(String filePath : filestodelete) {
+					if(!delete_realfile(filePath)) {
+						fileOperationsSuccessful = false;
+						break;
 					}
-				attch_dao.setNidx(nidx);
-				attch_dao.setFile_name(filename);
-				attch_dao.setFile_path(filepath);
-				attachments.add(attch_dao);
+				}
+			}
+			//새로운 파일 추가
+			List<notice_attachments_dao> attachments = new ArrayList<>();
+			if(newfiles != null && !newfiles.isEmpty() && fileOperationsSuccessful) {
+				String uploadDir = req.getServletContext().getRealPath("/upload/");
+				File dir = new File(uploadDir);
+				if(!dir.exists()) {
+					dir.mkdirs();
+				}
+				for(MultipartFile file : newfiles) {
+					if(!file.isEmpty()) {
+						String filename = file.getOriginalFilename();
+						String filepath = uploadDir + filename;
+						File f = new File(filepath);
+						try {
+							file.transferTo(f);//실제 파일 저장
+							//파일 저장 성공 시에만 첨부파일 정보 리스트에 추가
+							notice_attachments_dao attachment = new notice_attachments_dao();
+							attachment.setNidx(dao.getNidx());
+							attachment.setFile_name(filename);
+							attachment.setFile_path(filepath);
+							attachments.add(attachment);
+						} catch (Exception e) {
+							e.printStackTrace();
+							fileOperationsSuccessful = false;
+							break;
+						}
+					}
+				}
+			}
+			//파일 작업이 모두 성공했을 때 만 db 업데이트
+			if (fileOperationsSuccessful) {
+				int updateResult = tm2.update("shopping.update_notice",dao);
+				int removeFileResult = 1;//삭제할 파일이 없는 경우를 위해 기본값 설정
+				int saveFileResult = 1;//추가할 파일이 없는 경우를 위해 기본값 설정
+				//파일 삭제 db 업데이트
+				if(filestodelete != null && !filestodelete.isEmpty()) {
+					removeFileResult = tm2.delete("shopping.delete_file_path",filestodelete);
+				}
+				//파일 추가 db 업데이트
+				if(!attachments.isEmpty()) {
+					saveFileResult = tm2.insert("shopping.modify_insert_attachment",attachments);
+				}
+				
+				//db 업데이트가 모두 성공한 경우 결과 설정
+				if(updateResult > 0 && removeFileResult > 0 && saveFileResult > 0) {
+					result = "ok";
 				}else {
-					attch_dao.setNidx(dao.getNidx());
-					attch_dao.setFile_name(null);
-					attch_dao.setFile_path(null);
-					attachments.add(attch_dao);
-				}		}
-		return attachments;
-	}
-	
-	
-	//상품 등록
-	public int product_insert(products_dao dao, HttpServletRequest req) {
-		fileok(dao.getMain_product_image1_path(), dao , "main_product_image1" ,req);
-		fileok(dao.getMain_product_image2_path(), dao , "main_product_image2",req);
-		fileok(dao.getMain_product_image3_path(), dao , "main_product_image3",req);
-		int result = tm2.insert("shopping.product_insert",dao);
+					result = "no";
+				}
+			}else {
+				result = "no";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = "no";
+		}
+		
 		return result;
 	}
 	
-	
-	//상품 등록 시 이미지 파일 저장 경로 설정
-	public void fileok(MultipartFile file, products_dao dao, String fieldname,HttpServletRequest req) {
-		if(file!=null && !file.isEmpty()) {
-			try {
-				//웹 디렉토리 저장
-				String url = req.getServletContext().getRealPath("/upload/");
-				file.transferTo(new File(url+file.getOriginalFilename()));
-				
-				//db에 경로 저장
-				String filename =file.getOriginalFilename();
-				
-				switch (fieldname) {
-				case "main_product_image1":
-					dao.setMain_product_image1(filename);
-					break;
-				case "main_product_image2":
-					dao.setMain_product_image2(filename);
-					break;
-				case "main_product_image3":
-					dao.setMain_product_image3(filename);
-					break;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}else {
-			switch (fieldname) {
-			case "main_product_image1":
-				dao.setMain_product_image1(null);
-				break;
-			case "main_product_image2":
-				dao.setMain_product_image2(null);
-				break;
-			case "main_product_image3":
-				dao.setMain_product_image3(null);
-				break;
-			}
-		}
+
+	// 실제 파일 삭제 메소드
+	private boolean delete_realfile(String filePath) {
+	    File file = new File(filePath);
+	    return file.exists() && file.delete();
 	}
 	
 	//카테고리 등록
@@ -293,6 +309,7 @@ public class admin_ddl extends md5_pass{
 		}
 		return cd;
 	}
+	
 	//상품 리스트 출력 페이지
 	public List<products_dao> product_list(String admin_id,String search_part,String search_word,Integer startpg, Integer pageno) {
 		List<products_dao> pl = new ArrayList<products_dao>();
@@ -478,9 +495,9 @@ public class admin_ddl extends md5_pass{
 		String idck = null;
 		int result = tm2.selectOne("shopping.idcheck",admin_id);
 		if(result>0) {
-			idck = "no";
+			idck = "no";//중복됨
 		}else {
-			idck="yes";
+			idck="yes";//사용가능
 		}
 		return idck;
 	}

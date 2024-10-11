@@ -63,7 +63,7 @@
         </cr:if>
         <cr:if test="${data.admin_confirm=='N'}">
             <input type="button" onclick="disagree(${data.aidx})" value="미승인" class="new_addbtn2" title="미승인">
-        </cr:if>
+        </cr:if>        
         </li>
     </ol>
     </cr:if>

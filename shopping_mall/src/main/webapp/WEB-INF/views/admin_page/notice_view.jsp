@@ -44,9 +44,16 @@
 <ul>
     <li>첨부파일</li>
 	<li>
-		<a href="#" class="download-link"   data-filepath="${data2[0].file_path}">
-		     ${data2[0].file_name}
-		</a>       
+	<cr:if test="${data2 !=null}">
+	    <cr:forEach var="file" items="${data2}">
+			|<a href="#" class="download-link"   data-filepath="${file.file_path}">
+			     ${file.file_name}
+			</a>       
+		</cr:forEach>
+	</cr:if>
+	<cr:if test="${empty data2}">
+		첨부파일 없음
+	</cr:if>
 	</li>
 </ul>
 <ul class="ul_height">

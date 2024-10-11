@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -37,35 +41,47 @@ public class admin_controller {
 	PrintWriter pw = null;
 	@Resource(name="admin")
 	private admin_ddl ad;
-
-	//공지사항 view page 첨부파일 다운로드
-	@GetMapping("/admin/filedownload.do")
-	public ResponseEntity<FileSystemResource> notice_viewpage_file_download(@RequestParam("filePath") String filePath) {
-	    try {
-	        // Decode the file path if necessary
-	        filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString());
-	    } catch (UnsupportedEncodingException e) {
-	        return ResponseEntity.badRequest().build();
-	    }
-		
-		FileSystemResource resource = new FileSystemResource(filePath);
-        if (!resource.exists()) {
-            return ResponseEntity.notFound().build();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
-		
-		return ResponseEntity.ok()
-                .headers(headers)
-                .body(resource);
-	}
 	
+	@Autowired
+	private FileService fileService;
+	
+	//관리자 추가 페이지
+	@GetMapping("/admin/add_master.do")
+	public String add_master(@ModelAttribute admin_dao dao, Model m) {
+		
+		return "./admin_page/add_master";
+	}
+
+	//카테고리 등록 페이지
+	@GetMapping("/admin/cate_write.do")
+	public String cate_write() {	
+		return "./admin_page/cate_write";
+	}
 	
 	//공지사항 등록 페이지 이동
 	@GetMapping("/admin/notice_write.do")
 	public String notice_writeok() {
 		
 		return "./admin_page/notice_write";
+	}
+	
+	//관리자 로그인 페이지
+	@GetMapping("/admin/index.do")
+	public String admin_index() {
+		
+		return "./admin_page/index";
+	}
+	
+	//공지사항 게시글 수정페이지 출력
+	@GetMapping("/admin/notice_modify.do")
+	public String notice_modify(@RequestParam(value="",required = false)String nidx,HttpServletRequest req,Model m)throws Exception {
+			HttpSession hs =req.getSession();
+			List<notice_dao> data = ad.notice_view((String)hs.getAttribute("admin_id"), nidx);
+			List<notice_attachments_dao> data2 = ad.notice_view_attach((String)hs.getAttribute("admin_id"), nidx);
+			m.addAttribute("data",data);
+			m.addAttribute("data2",data2);
+
+		return "./admin_page/notice_modify";
 	}
 	
 	//공지사항 view 페이지
@@ -93,74 +109,112 @@ public class admin_controller {
 		return "./admin_page/notice_view";
 	}
 	
-	//공지사항 게시글 수정페이지 출력
-	@GetMapping("/admin/notice_modify.do")
-	public String notice_modify(@RequestParam(value="",required = false)String nidx,HttpServletRequest req,Model m)throws Exception {
-			HttpSession hs =req.getSession();
-			List<notice_dao> data = ad.notice_view((String)hs.getAttribute("admin_id"), nidx);
-			List<notice_attachments_dao> data2 = ad.notice_view_attach((String)hs.getAttribute("admin_id"), nidx);
-			m.addAttribute("data",data);
-			m.addAttribute("data2",data2);
-
-		return "./admin_page/notice_modify";
-	}
-	
-	//공지사항 게시물 등록
-	@PostMapping("/admin/notice_insertok.do")
-	public String notice_insertok(@ModelAttribute notice_dao dao,@RequestParam("nfile") List<MultipartFile> files,HttpServletResponse res,HttpServletRequest req)throws Exception {
-		res.setContentType("text/html;charset=utf-8");	
-		this.pw = res.getWriter();
-		String result = "";
-		result = ad.notice_insert(dao, files,req);
+	//관리자 리스트 출력
+	@GetMapping("/admin/admin_list.do")
+	public String admin_list(Model m,HttpServletResponse res) {
 		try {
-			if(result.equals("ok")) {
-				this.pw.print("<script>"
-						+ "alert('정상적으로 공지사항이 등록되었습니다.');"
-						+ "location.href='./notice_list.do';"
-						+ "</script>");
-			}
+			List<admin_dao> result = ad.alldata();
+			int ctn = ad.admin_count();
+			m.addAttribute("result",result);
+			m.addAttribute("ctn",ctn);
 		} catch (Exception e) {
 			e.printStackTrace();
-			this.pw.print("<script>"
-					+ "alert('오류로 인해 요청하신 작업을 처리하지 못했습니다.');"
-					+ "history.go(-1);"
-					+ "</script>");
-		}	
-		return null;
-	}
-	
-	//공지사항 수정페이지 게시글 수정 핸들링
-	@PostMapping("/admin/notice_modifyok.do")
-	public String notice_modifyok(@ModelAttribute notice_dao dao,
-			@RequestParam("nfile") List<MultipartFile> files,
-			@RequestParam("filesToDelete") List<String> filestodelete ,HttpServletResponse res,HttpServletRequest req)throws Exception {
-		res.setContentType("text/html;charset=utf-8");
-		this.pw = res.getWriter();
-		String result = "";
-		try {
-			result = ad.notice_modify(dao, req,filestodelete,files);
-			if(result.equals("ok")) {
-				this.pw.print("<script>"
-						+ "alert('정상적으로 공지사항이 수정되었습니다.');"
-						+ "location.href='./notice_modify.do';"
-						+ "</script>");				
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.pw.print("<script>"
-					+ "alert('오류가 발생하여 수정하지 못했습니다.');"
-					+ "location.href=history.go(-1);"
-					+ "</script>");	
 		}
-		return null;
+		return "./admin_page/admin_list";
 	}
 	
-	//카테고리 등록 페이지
-	@GetMapping("/admin/cate_write.do")
-	public String cate_write() {	
-		return "./admin_page/cate_write";
+	//상품 리스트 출력 페이지
+	@GetMapping("/admin/product_list.do")
+	public String product_list(@RequestParam(value = "",required = false)Integer page ,Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
+		HttpSession hs = req.getSession();
+		int pageno = 5;//한페이지 당 5개 씩
+		int startpg = 0;
+		try {
+			//페이징
+			if(page==null||page==1) {
+				startpg=0;
+			}else {
+				startpg = (page-1)*pageno;
+			}
+			//검색 기능
+			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word,pageno,startpg);
+			int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);				
+				m.addAttribute("result",result);
+				m.addAttribute("ctn",ctn);
+				m.addAttribute("search_part",search_part);
+				m.addAttribute("search_word",search_word);
+				m.addAttribute("startpg",startpg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "./admin_page/product_list";
 	}
 	
+	//상품 수정 페이지 출력
+	@GetMapping("/admin/product_edit.do")
+	public String product_edit(String pidx,Model m) {
+		List<products_dao> result = ad.product_edit(pidx);
+		List<cate_code_dao> result2 = ad.cateAllData();
+		m.addAttribute("products_info",result);
+		m.addAttribute("cate_info",result2);
+		return "./admin_page/product_edit";
+	}
+	
+	//일반회원 리스트 페이지
+	@GetMapping("/admin/shop_member_list.do")
+	public String shop_member_list(Model m,@RequestParam(value = "",required = false)Integer page) {
+		
+		int pageno = 15;
+		int startpg = 0;
+		if(page == null || page == 1) {
+			startpg = 0;
+		}else {
+			startpg = (page - 1)* pageno;
+		}
+		List<member_dao> result = ad.member_list(startpg, pageno);
+		int ctn = ad.member_list_count();
+		List<terms_dao> terms = ad.get_terms();
+		m.addAttribute("privacypolicy",terms.get(0).getTerm_content());
+		m.addAttribute("service_of_terms",terms.get(1).getTerm_content());
+		m.addAttribute("result",result);
+		m.addAttribute("ctn",ctn);
+		m.addAttribute("startpg",startpg);
+		
+		return "./admin_page/shop_member_list";
+	}
+	
+	//공지사항 리스트 페이지로 이동
+	@GetMapping("/admin/notice_list.do")
+	public String notice_list (@RequestParam(value = "",required = false)Integer page,Model m,HttpServletRequest req) {
+		int pageno = 15;
+		int startpg = 0;
+			if(page==null||page==1) {
+				startpg = 0;
+			}else {
+				startpg = (page-1)*pageno;
+			}			
+			HttpSession hs =req.getSession();
+		List<notice_dao> result = ad.notice_list((String)hs.getAttribute("admin_id"), startpg, pageno);
+		int ctn = ad.notice_list_count((String)hs.getAttribute("admin_id"));
+		m.addAttribute("ctn",ctn);
+		m.addAttribute("result_nt",result);
+		m.addAttribute("startpg_nt",startpg);
+		
+		return "./admin_page/notice_list";
+	}
+	
+	//웹 사이트 기본설정 페이지 
+	@GetMapping("/admin/admin_siteinfo.do")
+	public String admin_siteinfo(HttpServletRequest req,Model m) {
+		List<website_settings_dao> sitedata = ad.website_setting_data();
+		List<company_info_dao> companydata = ad.company_info_data();
+		List<payment_delivery_settings_dao> pddata = ad.payment_delivery_info();
+		
+		m.addAttribute("sitedata",sitedata);
+		m.addAttribute("companydata", companydata);
+		m.addAttribute("pddata",pddata);
+		return "./admin_page/admin_siteinfo";
+	}
 	
 	//상품등록 페이지 이동
 	@GetMapping("/admin/product_write.do")
@@ -173,7 +227,6 @@ public class admin_controller {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("db오류-1");
 		}
 		return "./admin_page/product_write";
 	}
@@ -202,69 +255,81 @@ public class admin_controller {
 		}
 		return "./admin_page/cate_list";
 	}
-	
-	
-	//공지사항 리스트 페이지로 이동
-	@GetMapping("/admin/notice_list.do")
-	public String notice_list (@RequestParam(value = "",required = false)Integer page,Model m,HttpServletRequest req) {
-		int pageno = 15;
-		int startpg = 0;
-			if(page==null||page==1) {
-				startpg = 0;
-			}else {
-				startpg = (page-1)*pageno;
-			}			
-			HttpSession hs =req.getSession();
-		List<notice_dao> result = ad.notice_list((String)hs.getAttribute("admin_id"), startpg, pageno);
-		int ctn = ad.notice_list_count((String)hs.getAttribute("admin_id"));
-		System.out.println(result);
-		m.addAttribute("ctn",ctn);
-		m.addAttribute("result_nt",result);
-		m.addAttribute("startpg_nt",startpg);
+	//공지사항 view page 첨부파일 다운로드
+	@GetMapping("/admin/filedownload.do")
+	public ResponseEntity<FileSystemResource> notice_viewpage_file_download(@RequestParam("filePath") String filePath) {
+	    try {
+	        // Decode the file path if necessary
+	        filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString());
+	    } catch (UnsupportedEncodingException e) {
+	        return ResponseEntity.badRequest().build();
+	    }
 		
-		return "./admin_page/notice_list";
+		FileSystemResource resource = new FileSystemResource(filePath);
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+		
+		return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
 	}
 	
-	//일반회원 리스트 페이지
-	@GetMapping("/admin/shop_member_list.do")
-	public String shop_member_list(Model m,@RequestParam(value = "",required = false)Integer page) {
-		
-		int pageno = 15;
-		int startpg = 0;
-		if(page == null || page == 1) {
-			startpg = 0;
-		}else {
-			startpg = (page - 1)* pageno;
+	
+	//공지사항 게시물 등록
+	@PostMapping("/admin/notice_insertok.do")
+	public String notice_insertok(@ModelAttribute notice_dao dao,@RequestParam("nfile") List<MultipartFile> files,HttpServletResponse res,HttpServletRequest req)throws Exception {
+		res.setContentType("text/html;charset=utf-8");	
+		this.pw = res.getWriter();
+		String result = "";
+	    String cleanContent = dao.getNotice_content().replaceAll("<[^>]*>", "");
+	    dao.setNotice_content(cleanContent);
+		result = ad.notice_insert(dao, files,req);
+		try {
+			if(result.equals("ok")) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 공지사항이 등록되었습니다.');"
+						+ "location.href='./notice_list.do';"
+						+ "</script>");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류로 인해 요청하신 작업을 처리하지 못했습니다.');"
+					+ "history.go(-1);"
+					+ "</script>");
+		}	
+		return null;
+	}
+	
+	//공지사항 수정페이지 게시글 수정 핸들링
+	@PostMapping("/admin/notice_modifyok.do")
+	public String notice_modifyok(@ModelAttribute notice_dao dao,
+			@RequestParam("nfile") List<MultipartFile> files,
+			@RequestParam("filesToDelete") List<String> filestodelete ,HttpServletResponse res,HttpServletRequest req)throws Exception {
+		res.setContentType("text/html;charset=utf-8");
+		this.pw = res.getWriter();
+	    String cleanContent = dao.getNotice_content().replaceAll("<[^>]*>", "");
+	    dao.setNotice_content(cleanContent);
+		String result = "";
+		try {
+			result = ad.notice_modify(dao, req,filestodelete,files);
+			if(result.equals("ok")) {
+				this.pw.print("<script>"
+						+ "alert('정상적으로 공지사항이 수정되었습니다.');"
+						+ "location.href='./notice_list.do';"
+						+ "</script>");				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.pw.print("<script>"
+					+ "alert('오류가 발생하여 수정하지 못했습니다.');"
+					+ "location.href=history.go(-1);"
+					+ "</script>");	
 		}
-		List<member_dao> result = ad.member_list(startpg, pageno);
-		int ctn = ad.member_list_count();
-		List<terms_dao> terms = ad.get_terms();
-		m.addAttribute("privacypolicy",terms.get(0).getTerm_content());
-		m.addAttribute("service_of_terms",terms.get(1).getTerm_content());
-		m.addAttribute("result",result);
-		m.addAttribute("ctn",ctn);
-		m.addAttribute("startpg",startpg);
-		
-		return "./admin_page/shop_member_list";
-	}
-	
-	//관리자 추가 페이지 이동
-	@GetMapping("/admin/add_master.do")
-	public String add_master() {
-		return "/add_master";
-	}
-	
-	//웹 사이트 기본설정 페이지 
-	@GetMapping("/admin/admin_siteinfo.do")
-	public String admin_siteinfo(HttpServletRequest req,Model m) {
-		List<website_settings_dao> sitedata = ad.website_setting_data();
-		List<company_info_dao> companydata = ad.company_info_data();
-		List<payment_delivery_settings_dao> pddata = ad.payment_delivery_info();
-		
-		m.addAttribute("sitedata",sitedata);
-		m.addAttribute("companydata", companydata);
-		m.addAttribute("pddata",pddata);
-		return "./admin_page/admin_siteinfo";
+		return null;
 	}
 	
 	//상품 삭제
@@ -297,7 +362,6 @@ public class admin_controller {
 		this.pw = res.getWriter();
 		try {
 			int result = ad.notice_delete(nidx, req);
-			System.out.println(result);
 			if(result>0) {
 				this.pw.write("<script>"
 						+ "alert('게시글이 정상적으로 삭제되었습니다.');"
@@ -349,55 +413,49 @@ public class admin_controller {
 		return null;
 	}
 	
-	//상품 수정 페이지 출력
-	@GetMapping("/admin/product_edit.do")
-	public String product_edit(String pidx,Model m) {
-		System.out.println(pidx);
-		List<products_dao> result = ad.product_edit(pidx);
-		m.addAttribute("products_info",result);
-		return "./admin_page/product_edit";
-	}
-	
-	//상품 리스트 출력 페이지
-	@GetMapping("/admin/product_list.do")
-	public String product_list(@RequestParam(value = "",required = false)Integer page ,Model m,@RequestParam(defaultValue = "",required = false)String search_part,@RequestParam(defaultValue = "",required = false)String search_word,HttpServletRequest req) {
-		HttpSession hs = req.getSession();
-		int pageno = 5;//한페이지 당 5개 씩
-		int startpg = 0;
-		try {
-			//페이징
-			if(page==null||page==1) {
-				startpg=0;
-			}else {
-				startpg = (page-1)*pageno;
-			}
-			//검색 기능
-			List<products_dao> result = ad.product_list((String)hs.getAttribute("admin_id"),search_part,search_word,pageno,startpg);
-			int ctn = ad.product_list_ea((String)hs.getAttribute("admin_id"),search_part,search_word);				
-				m.addAttribute("result",result);
-				m.addAttribute("ctn",ctn);
-				m.addAttribute("search_part",search_part);
-				m.addAttribute("search_word",search_word);
-				m.addAttribute("startpg",startpg);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "./admin_page/product_list";
-	}
 	
 	//상품 등록
 	@PostMapping("/admin/product_insertok.do")
-	public String product_insertok(@ModelAttribute products_dao dao, HttpServletResponse res, HttpServletRequest req)throws Exception{
+	public String product_insertok(@ModelAttribute products_dao dao,
+		    @RequestParam("main_image") MultipartFile mainImage, 
+		    @RequestParam("add_image1") MultipartFile addImage1,
+		    @RequestParam("add_image2") MultipartFile addImage2,
+			HttpServletResponse res, HttpServletRequest req)throws Exception{
 		res.setContentType("text/html;charset=utf-8");	
 		this.pw = res.getWriter();
+		System.out.println(mainImage);
 		try {
-			int result = ad.product_insert(dao,req);
-			if(result>0) {
-				this.pw.print("<script>"
-						+ "alert('정상적으로 상품이 등록 되었습니다.');"
-						+ "location.href='./product_list.do';"
-						+ "</script>");
-			}
+			//파일 처리
+			List<MultipartFile> files = Arrays.asList(mainImage, addImage1, addImage2);
+			List<String> imagePaths = new ArrayList<>();
+	        for (MultipartFile file : files) {
+	            if (!file.isEmpty()) {
+	                // 1. 파일 업로드
+	                String filePath = ad.uploadFile(file); // 파일 서버에 업로드 후 경로 받기
+	                imagePaths.add(filePath);
+	            } else {
+	                imagePaths.add(null); // 파일이 없을 경우 NULL 처리
+	            }
+	        }			
+			
+	        // 2. 제품 기본 정보 저장
+	        int result = ad.product_insert(dao);
+
+	        if (result > 0) {
+	        	int productId = dao.getPidx();// 삽입된 제품 ID 가져오기
+	        // 3. 파일 경로를 DB에 저장
+	            for (int i = 0; i < imagePaths.size(); i++) {
+	                if (imagePaths.get(i) != null) {
+	                    String imageType = (i == 0) ? "main" : "additional"; // 첫 번째 파일은 'main', 나머지는 'additional'
+	                    ad.saveProductImage(productId, imagePaths.get(i), imageType);
+	                }
+	            }
+
+	            this.pw.print("<script>"
+	                    + "alert('정상적으로 상품이 등록되었습니다.');"
+	                    + "location.href='./product_list.do';"
+	                    + "</script>");
+	        }
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
@@ -513,38 +571,19 @@ public class admin_controller {
 		return null;
 	}
 	
-	//관리자 리스트 출력
-	@GetMapping("/admin/admin_list.do")
-	public String admin_list(Model m,HttpServletResponse res) {
-		try {
-			List<admin_dao> result = ad.alldata();
-			int ctn = ad.admin_count();
-			m.addAttribute("result",result);
-			m.addAttribute("ctn",ctn);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "./admin_page/admin_list";
-	}
 	
 	//아이디 중복 체크
 	@PostMapping("/admin/idcheckok.do")
-	public String idcheckok(String admin_id,HttpServletResponse res)throws Exception{
-		res.setContentType("text/html;charset=utf-8");
-		this.pw = res.getWriter();
+	@ResponseBody
+	public String idcheckok(@RequestParam("admin_id") String admin_id, HttpServletResponse res)throws Exception{
+		String result = null;
 		try {
-			String result = ad.idcheck(admin_id);
-			this.pw.print(result);
+			result = ad.idcheck(admin_id);
 		} catch (Exception e) {
 			e.printStackTrace();
-			this.pw.print("<script>"
-					+ "alert('데이터 오류로 인해 확인이되지않습니다.');"
-					+ "history.go(-1);"
-					+ "</script>");
-		}finally {
-			this.pw.close();
+			return "오류가 발생했습니다. 다시 시도해주세요.";
 		}
-		return null;
+		return result;
 	}
 	
 	//로그아웃
@@ -556,9 +595,9 @@ public class admin_controller {
 			HttpSession hs = req.getSession();
 			String admin_id = (String)hs.getAttribute("admin_name");
 			if(admin_id==null) {
-				this.pw.print("<script>alert('잘못된 접근 입니다.');location.href='./admin_page/index.do';</script>");
+				this.pw.print("<script>alert('잘못된 접근 입니다.');location.href='./index.do';</script>");
 			}
-			this.pw.print("<script>alert('정상적으로 로그아웃 되셨습니다.');location.href='./admin_page/index.do';</script>");
+			this.pw.print("<script>alert('정상적으로 로그아웃 되셨습니다.');location.href='./index.do';</script>");
 			hs.invalidate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -574,27 +613,36 @@ public class admin_controller {
 		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();
 		try {
-			admin_dao data = ad.login(formData);
-			if(data.getAdmin_id() != null && (data.getAdmin_confirm().equals("Y")||data.getAdmin_confirm().equals("-"))) {
+			admin_dao data = ad.login(formData);//로그인 시도
+			if(data == null || data.getAdmin_id() == null) {
+				this.pw.print("<script>"
+						+ "alert('아이디 및 비밀번호를 확인하세요.');"
+						+ "location.href='./index.do';"
+						+ "</script>");		
+				return null; //로그인 실패 후 처리 반환
+			}
+			//관리자 승인상태에 따라 로그인 처리
+			if(data.getAdmin_confirm().equals("Y")||data.getAdmin_confirm().equals("-")) {
 				HttpSession session = req.getSession();
 				session.setAttribute("admin_name", data.getAdmin_name());
 				session.setAttribute("admin_id", data.getAdmin_id());
 				session.setMaxInactiveInterval(1800);
+				
 				this.pw.print("<script>"
 						+ "alert('"+data.getAdmin_name()+"님 환영합니다.');"
-						+ "location.href='./admin_main.do';"
+						+ "location.href='./admin_list.do';"
 						+ "</script>");
-			}else if(data.getAdmin_id() != null && data.getAdmin_confirm().equals("N")) {
+			}else if(data.getAdmin_confirm().equals("N")) {
 				this.pw.print("<script>"
 						+ "alert('관리자 등록 승인되지 않았습니다. 승인된 후 로그인 시도하세요.');"
-						+ "location.href='./admin_page/index.do';"
+						+ "location.href='./index.do';"
 						+ "</script>");				
-			}
-		} catch (Exception e) {
+			}			
+		}catch (Exception e) {
 			e.printStackTrace();
 			this.pw.print("<script>"
-					+ "alert('아이디와 비밀번호를 확인하세요.');"
-					+ "location.href='./admin_page/index.do';"
+					+ "alert('로그인 중 오류가 발생했습니다.');"
+					+ "location.href='./index.do';"
 					+ "</script>");
 		}finally {
 			this.pw.close();
@@ -612,7 +660,7 @@ public class admin_controller {
 			if(callback>0) {
 				this.pw.print("<script>"
 						+ "alert('정상적으로 관리자 등록을 요청하였습니다.');"
-						+ "history.go(-1);"
+						+ "location.href='./index.do'"
 						+ "</script>");
 			}
 		} catch (Exception e) {
@@ -625,12 +673,5 @@ public class admin_controller {
 			this.pw.close();
 		}
 		return null;
-	}
-
-	//관리자 로그인 페이지
-	@GetMapping("/admin/index.do")
-	public String admin_index() {
-		
-		return "./admin_page/index";
 	}
 }

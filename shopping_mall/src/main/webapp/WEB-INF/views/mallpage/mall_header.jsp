@@ -2,9 +2,19 @@
     pageEncoding="UTF-8"%>
 <%@taglib prefix="cr" uri="http://java.sun.com/jsp/jstl/core" %>     
     <div class="navbar">
-      <a href="#" id="logo">
-        <img src="../mallpage/images/logo.jpg" width="149">
-        </a>
+   	<cr:choose>
+   		<cr:when test="${not empty mid}">
+   			<a href="./mall_index" id="logo">
+   				<img src="../mallpage/images/logo.jpg" width="149">
+   			</a>
+   		</cr:when>
+   		<cr:otherwise>
+	      <a href="./login.do" id="logo">
+	        <img src="../mallpage/images/logo.jpg" width="149">
+	      </a>
+   		
+   		</cr:otherwise>
+   	</cr:choose>
         <ul id="menu">
         	<cr:if test="${mid==null}">
           		<li><a href="./login.do">LOGIN</a></li>

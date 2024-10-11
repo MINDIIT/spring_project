@@ -82,8 +82,14 @@ $(function(){
 	//메일인증여부 플래그
 	let isEmailVerified = false;
 	
-	//이메일 인증 버튼
+	//인증 메일 발송 버튼
 	$('#email_verification').click(function(){
+		if($('#memail').val()=="" || $('#memail').val() == null){
+			alert("이메일 주소를 입력해주세요");
+			$('#memail').focus();
+			return false;
+		}
+		
 		$('#timer').text('03:00');
 		var verify_code = generateAuthCode();
 		
@@ -160,9 +166,17 @@ $(function(){
 				if($data =="success"){
 					alert("인증되었습니다.");
 					isEmailVerified = true;
+					
+					//타이머 멈추기 
+					clearTimeout(countdown);
+					countdown = null;
+					
+					//타이머와 재발송 버튼, 인증확인 버튼 숨기기
+					$('#timer').hide();
+					$('#resendBtn').hide();
+					$('#email_verifyck').hide();
 					//이메인 인증버튼, 재발송 버튼 비활성화
 					$('#email_verification').prop('disabled', true); 
-					$('#resendBtn').prop('disabled', true);
 				}else{
 					alert("인증 실패! 올바른 코드를 입력해주세요.");
 				}

@@ -154,7 +154,7 @@
     width: 60px;
 }
 .new_admin_title > li:nth-of-type(10), .new_admin_lists > li:nth-of-type(10){
-    width: 98px;
+    width: 96px;
 }
 
 .new_admin_title2 > li, .new_admin_lists2 > li {
@@ -204,7 +204,7 @@
     width: 118px;
 }
 .new_admin_title2 > li:nth-of-type(9), .new_admin_lists2 > li:nth-of-type(9){
-    width: 110px;
+    width: 108px;
 }
 .new_addbtn1,.new_addbtn2 { 
     width: 45px;

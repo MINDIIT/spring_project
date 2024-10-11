@@ -26,4 +26,12 @@
 	<select id="footer_banner" resultType="companyinfodao">
 		SELECT * FROM company_info ORDER BY sidx DESC LIMIT 1
 	</select>	
+<!-- 쇼핑몰 메인 페이지 대메뉴 출력 -->
+	<select id="selectCateforMallIndex" resultType="Map">
+		SELECT * FROM classification_code WHERE menu_usage = 'Y'
+	</select>	
+<!-- 메인 페이지 상품 출력 -->	
+	<select id="selectProducts" resultType="Map">
+	    SELECT * FROM products WHERE is_available = 'Y'
+	</select>	
 </mapper>

@@ -27,6 +27,17 @@ public class shopping_ddl extends md5_pass{
 	@Resource(name="TemplateMall")
 	private SqlSessionTemplate tm3;
 	
+	//메인 페이지 상품 출력
+	public List<Map<String, Object>> getProducts(){
+		return tm3.selectList("mall.selectProducts");
+	}
+	
+	//메인 페이지 대메뉴 출력
+	public List<Map<String, Object>> CateInfo(){
+		List<Map<String, Object>> data = tm3.selectList("mall.selectCateforMallIndex");
+		return data;
+	}
+	
 	//로그인 페이지 - footer 회사 정보 출력
 	public List<company_info_dao> Company_info() {
 		List<company_info_dao> data = tm3.selectList("mall.footer_banner");

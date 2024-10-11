@@ -31,18 +31,17 @@ $(function(){
 	function validateFile(input) {
 		var file = input[0].files[0];
 		var validExtensions = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-		//파일이 존재 하고 유효한 파일 형식에 포함되지 않으면
-		console.log("File type:", file.type);
-		/*
-		if(file && !validExtensions.includes(file.type)){
-			alert('이미지 파일만 업로드 가능합니다.(jpg, jpeg, png, gif)');
-			input.val('');
-		}*/
+	    if(file && !validExtensions.includes(file.type)){
+	        alert('이미지 파일만 업로드 가능합니다.(jpg, jpeg, png, gif)');
+	        input.val('');
+	        return false;
+	    }
+		return true;
 	}
 	
 	
     // 각 파일 입력 요소에 대해 change 이벤트 핸들러 설정
-    $('#main_product_image1, #main_product_image2, #main_product_image3').on('change', function() {
+    $('#main_image, #add_image1, #add_image2').on('change', function() {
         validateFile($(this));
     });	
 	
@@ -107,16 +106,17 @@ $(function(){
 		location.href='./product_list.do';
 		
 	});
+	var fileox = false;
 	
 	//상품 등록 버튼
 	$('#product_insert_btn').click(function(){
-		//파일이 첨부되었는지 여부를 검사하는 변수
-		var fileox = false;
-		
-		//파일이 있으면 true 값 입력됨
-		if($('#main_product_image1').val()|| $('#main_product_image2').val() || $('#main_product_image3').val()){
-			fileox = true;
-		}
+	    var mainImageValid = validateFile($('#main_image'));
+	    var addImage1Valid = validateFile($('#add_image1'));
+	    var addImage2Valid = validateFile($('#add_image2'));		
+	    // 파일 유효성 검사를 통과한 파일이 하나라도 있는지 확인
+	    fileox = (mainImageValid && $('#main_image')[0].files.length > 0) ||
+	             (addImage1Valid && $('#add_image1')[0].files.length > 0) ||
+	             (addImage2Valid && $('#add_image2')[0].files.length > 0);
 		
 		//할인율이 입력되지 않았을 경우 값을 0으로 설정
 		if($('#discount_rate').val() === ''){

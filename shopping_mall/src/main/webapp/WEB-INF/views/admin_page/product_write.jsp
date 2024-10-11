@@ -111,15 +111,15 @@
         <li>
             <ol style="width:100%; height: auto;">
             <li style="width:100%; height:45px;">
-            <input type="file" accept="image/*" id="main_product_image1" name="main_product_image1_path">
+            <input type="file" accept="image/*" id="main_image" name="main_image">
             <span class="help_text">※ 상품 대표이미지 이며, 이미지 용량은 2MB 까지 입니다.</span>
             </li>
             <li style="height:45px;">
-            <input type="file" accept="image/*" id="main_product_image2" name="main_product_image2_path">
+            <input type="file" accept="image/*" id="add_image1" name="add_image1">
             <span class="help_text">※ 추가 이미지 이며, 이미지 용량은 2MB 까지 입니다.</span>
             </li>
             <li style="height:45px;">
-            <input type="file" accept="image/*" id="main_product_image3" name="main_product_image3_path">
+            <input type="file" accept="image/*" id="add_image2" name="add_image2">
             <span class="help_text">※ 추가 이미지 이며, 이미지 용량은 2MB 까지 입니다.</span>
             </li>
             </ol>

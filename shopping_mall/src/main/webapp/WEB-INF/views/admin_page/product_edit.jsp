@@ -33,12 +33,12 @@
     <ul>
         <li>대메뉴 카테고리</li>
         <li>
-            <select class="product_input1" id="main_menu_name" name="main_menu_name" value="products_info[0].main_menu_name">
-            <cr:forEach var="data" items="${result}">
+            <select class="product_input1" id="main_menu_name" name="main_menu_name">
+            <cr:forEach var="data" items="${cate_info}">
                 <option value="${data.main_menu_name}" data-main-menu-code="${data.main_menu_code}" data-classification-code="${data.classification_code}"
-                 <c:if test="${data.main_menu_name == products_info[0].main_menu_name}">
+                 <cr:if test="${data.main_menu_name == products_info[0].main_menu_name}">
                     selected
-                </c:if>>${data.main_menu_name}</option>
+                </cr:if>>${data.main_menu_name}</option>
             </cr:forEach>   
             </select>
             <input type="button" value="카테고리 등록" title="카테고리 등록" class="product_btn" id="cate_add"> 

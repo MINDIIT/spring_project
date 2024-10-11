@@ -3,6 +3,7 @@ package shopping;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +33,11 @@ public class shop_controller {
 	@GetMapping("/mallpage/mall_index")
 	public String mall_index(Model m) {
 		List<company_info_dao> data = sd.Company_info();
-		m.addAttribute("company_info",data);		
+		List<Map<String, Object>> data2 = sd.CateInfo();
+		List<Map<String, Object>> data3 = sd.getProducts();
+		m.addAttribute("company_info",data);
+		m.addAttribute("cate_info",data2);
+		m.addAttribute("product_list",data3);
 		return "./mallpage/mall_index";
 	}
 	
@@ -48,13 +53,14 @@ public class shop_controller {
 	//회원 가입 
 	@PostMapping("/mallpage/member_joinok.do")
 	public String member_join(@ModelAttribute("mall")member_dao dao,HttpServletResponse res) throws Exception {
+		res.setContentType("text/html;charset=utf-8");
 		this.pw = res.getWriter();
 		try {
 			int result = sd.member_join(dao);
 			if(result>0) {
 				this.pw.print("<script>"
 						+ "alert('회원 가입이 완료되었습니다.');"
-						+ "location.href='./login.jsp';"
+						+ "location.href='./login.do';"
 						+ "</script>");
 			}
 		} catch (Exception e) {

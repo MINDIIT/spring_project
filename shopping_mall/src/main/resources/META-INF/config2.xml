@@ -14,5 +14,6 @@
 		<typeAlias alias="noticeattachmentsdao" type="shopping_admin.notice_attachments_dao"/>
 		<typeAlias alias="memberdao" type="shopping_admin.member_dao" />
 		<typeAlias alias="termsdao" type="shopping_admin.terms_dao"/>
+		<typeAlias alias="productimagedao" type="shopping_admin.products_attachments_dao"/>
 	</typeAliases>
 </configuration>
